@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "ACTCharacter.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
+
 UCLASS()
 class ACTIONROGUELIKE_API AACTCharacter : public ACharacter
 {
@@ -16,8 +19,17 @@ public:
 	AACTCharacter();
 
 protected:
+
+	UPROPERTY(VisibleAnywhere,Category="View")
+	UCameraComponent* CameraComponent;
+
+	UPROPERTY(VisibleAnywhere,Category="View")
+	USpringArmComponent* SpringArmComponent;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	void MoveForward(float value);
+	void MoveRight(float value);
 
 public:	
 	// Called every frame
