@@ -77,5 +77,6 @@ void AACTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("MoveRight",this,&AACTCharacter::MoveRight);
 
 	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed,this,&AACTCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&AACTCharacter::Jump);
 }
 
