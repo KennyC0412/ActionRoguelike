@@ -5,7 +5,7 @@
 
 #include "ACTGameplayInterface.h"
 #include "DrawDebugHelpers.h"
-#include "Evaluation/Blending/MovieSceneBlendType.h"
+
 
 DEFINE_LOG_CATEGORY_STATIC(LogInteraction, All, All)
 
@@ -41,23 +41,39 @@ void UACTInteractionComponent::PrimaryInteract()
 	FRotator EyeRotation;
 	Owner->GetActorEyesViewPoint(EyeLocation,EyeRotation);
 
-	FVector End;
-	End = EyeLocation + (EyeRotation.Vector() * 200);
+	FVector End = EyeLocation + (EyeRotation.Vector() * 200);
+
+	/*FHitResult Hit;
+	bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQueryParams);*/
+
+	TArray<FHitResult> HitArray;
+
+	float Radius = 30.0f;
 	
-	FHitResult Hit;
-	GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQueryParams);
-	DrawDebugLine(GetWorld(),EyeLocation,End,FColor::Red,false,3.0f,0,5);
-	AActor* HitActor = Hit.GetActor();
-	if(HitActor)
+	FCollisionShape Shape;
+	Shape.SetSphere(Radius);
+	
+	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(HitArray,EyeLocation,End,FQuat::Identity,ObjectQueryParams,Shape);
+	
+	FColor LineColor = bBlockingHit ? FColor::Red : FColor::Blue;
+
+	for(FHitResult HitResult : HitArray)
 	{
-		if(HitActor->Implements<UACTGameplayInterface>())
+		AActor* HitActor = HitResult.GetActor();
+		if(HitActor)
 		{
-			APawn* InstigatorPawn = Cast<APawn>(Owner);
-			UE_LOG(LogInteraction,Display,TEXT("%s"),ToCStr(HitActor->GetName()));
-			IACTGameplayInterface::Execute_Interact(HitActor,InstigatorPawn);
+			DrawDebugSphere(GetWorld(),HitResult.ImpactPoint,Radius,32,LineColor,false,2.0f);
+			if(HitActor->Implements<UACTGameplayInterface>())
+			{
+				APawn* InstigatorPawn = Cast<APawn>(Owner);
+				UE_LOG(LogInteraction,Display,TEXT("%s"),ToCStr(HitActor->GetName()));
+				IACTGameplayInterface::Execute_Interact(HitActor,InstigatorPawn);
+				break;
+			}
 		}
 	}
-	
+
+	DrawDebugLine(GetWorld(),EyeLocation,End,LineColor,false,3.0f,0,5.0f);
 }
 
 // Called every frame
