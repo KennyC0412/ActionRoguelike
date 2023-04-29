@@ -17,8 +17,13 @@ class ACTIONROGUELIKE_API AACTCharacter : public ACharacter
 
 protected:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,Category="Attack")
+	UAnimMontage* AttackAnim;
+	
+	UPROPERTY(EditAnywhere,Category="Attack")
 	TSubclassOf<AActor> ProjectileClass;
+
+	FTimerHandle TimerHandle_PrimaryAttack;
 
 public:
 	// Sets default values for this character's properties
@@ -40,6 +45,7 @@ protected:
 
 	void MoveForward(float value);
 	void MoveRight(float value);
+	void PrimaryAttack_TimeElapsed() const;
 	void PrimaryAttack();
 	void PrimaryInteract();
 	

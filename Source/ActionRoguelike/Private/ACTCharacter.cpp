@@ -46,11 +46,28 @@ void AACTCharacter::MoveRight(float value)
 	
 	FVector RightVecator = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
 	
-	AddMovementInput(	RightVecator,value);
+	AddMovementInput(RightVecator,value);
+}
+
+void AACTCharacter::PrimaryAttack_TimeElapsed() const
+{
+	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	
+	FTransform SpawnTM = FTransform(GetControlRotation(),HandLocation);
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	GetWorld()->SpawnActor<AActor>(ProjectileClass,SpawnTM,SpawnParams);
 }
 
 void AACTCharacter::PrimaryAttack()
 {
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&AACTCharacter::PrimaryAttack_TimeElapsed,0.2f);
+	//GetWorldTimerManager().Clear(TimerHandle_PrimaryAttack);
+	return ;
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 	
 	FTransform SpawnTM = FTransform(GetControlRotation(),HandLocation);
@@ -73,7 +90,6 @@ void AACTCharacter::PrimaryInteract()
 void AACTCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 
