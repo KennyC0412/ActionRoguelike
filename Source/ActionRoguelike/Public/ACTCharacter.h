@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ACTCharacter.generated.h"
 
+class UACTInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -30,12 +31,17 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,Category="View")
 	USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(VisibleAnywhere,Category="View")
+	UACTInteractionComponent* InteractionComp;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void MoveForward(float value);
 	void MoveRight(float value);
 	void PrimaryAttack();
+	void PrimaryInteract();
 	
 public:	
 	// Called every frame

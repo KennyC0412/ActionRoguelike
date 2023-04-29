@@ -11,13 +11,14 @@ AACTBarrel::AACTBarrel()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
-	StaticMeshComp->SetupAttachment(RootComponent);
+	RootComponent = StaticMeshComp;
+	//StaticMeshComp->SetupAttachment(RootComponent);
 	StaticMeshComp->SetSimulatePhysics(true);
 	//StaticMeshComp->SetCollisionObjectType(ECC_PhysicsBody);
 	//StaticMeshComp->SetCollisionProfileName("PhysicsActor");
 
 	RadialForceComp = CreateDefaultSubobject<URadialForceComponent>("RadialForceComp");
-	RadialForceComp->SetupAttachment(StaticMeshComp);
+	RadialForceComp->SetupAttachment(RootComponent);
 	RadialForceComp->Radius = 2000;
 	RadialForceComp->ImpulseStrength = 5000;
 

@@ -3,6 +3,7 @@
 
 #include "ACTCharacter.h"
 
+#include "ACTInteractionComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -20,6 +21,8 @@ AACTCharacter::AACTCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
+
+	InteractionComp = CreateDefaultSubobject<UACTInteractionComponent>("InteractionComp");
 }
 
 // Called when the game starts or when spawned
@@ -58,6 +61,14 @@ void AACTCharacter::PrimaryAttack()
 	GetWorld()->SpawnActor<AActor>(ProjectileClass,SpawnTM,SpawnParams);
 }
 
+void AACTCharacter::PrimaryInteract()
+{
+	if(InteractionComp)
+	{
+		InteractionComp->PrimaryInteract();
+	}
+}
+
 // Called every frame
 void AACTCharacter::Tick(float DeltaTime)
 {
@@ -78,5 +89,7 @@ void AACTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed,this,&AACTCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&AACTCharacter::Jump);
+	PlayerInputComponent->BindAction("Execute",IE_Pressed,InteractionComp,&UACTInteractionComponent::PrimaryInteract);
+
 }
 
