@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ACTCharacter.generated.h"
 
+class UACTAttributeComponent;
 class UACTInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -21,7 +22,13 @@ protected:
 	UAnimMontage* AttackAnim;
 	
 	UPROPERTY(EditAnywhere,Category="Attack")
-	TSubclassOf<AActor> ProjectileClass;
+	TSubclassOf<AActor> NormalProjectileClass;
+
+	UPROPERTY(EditAnywhere,Category="Attack")
+	TSubclassOf<AActor> MagicProjectileClass;
+
+	UPROPERTY(EditAnywhere,Category="Attack")
+	TSubclassOf<AActor> DashProjectileClass;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
 
@@ -31,22 +38,30 @@ public:
 
 protected:
 
-	UPROPERTY(VisibleAnywhere,Category="View")
+	UPROPERTY(VisibleAnywhere,Category="Components")
 	UCameraComponent* CameraComp;
 
-	UPROPERTY(VisibleAnywhere,Category="View")
+	UPROPERTY(VisibleAnywhere,Category="Components")
 	USpringArmComponent* SpringArmComp;
 
-	UPROPERTY(VisibleAnywhere,Category="View")
+	UPROPERTY(VisibleAnywhere,Category="Components")
 	UACTInteractionComponent* InteractionComp;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
+	UACTAttributeComponent* AttributeComp;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void MoveForward(float value);
 	void MoveRight(float value);
-	void PrimaryAttack_TimeElapsed();
-	void PrimaryAttack();
+	void DashAttack_TimeElapsed();
+	void NormalAttack_TimeElapsed();
+	void MagicAttack_TimeElapsed();
+	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
+	void NormalAttack();
+	void MagicAttack();
+	void DashAttack();
 	void PrimaryInteract();
 	
 public:	

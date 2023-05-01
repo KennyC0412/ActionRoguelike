@@ -66,7 +66,7 @@ void UACTInteractionComponent::PrimaryInteract()
 			if(HitActor->Implements<UACTGameplayInterface>())
 			{
 				APawn* InstigatorPawn = Cast<APawn>(Owner);
-				UE_LOG(LogInteraction,Display,TEXT("%s"),ToCStr(HitActor->GetName()));
+				UE_LOG(LogInteraction,Display,TEXT("%s"),*GetNameSafe(HitActor));
 				IACTGameplayInterface::Execute_Interact(HitActor,InstigatorPawn);
 				break;
 			}

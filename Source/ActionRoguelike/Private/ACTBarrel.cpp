@@ -3,6 +3,7 @@
 
 #include "ACTBarrel.h"
 
+#include "DrawDebugHelpers.h"
 #include "PhysicsEngine/RadialForceComponent.h"
 
 // Sets default values
@@ -19,8 +20,9 @@ AACTBarrel::AACTBarrel()
 
 	RadialForceComp = CreateDefaultSubobject<URadialForceComponent>("RadialForceComp");
 	RadialForceComp->SetupAttachment(RootComponent);
-	RadialForceComp->Radius = 2000;
-	RadialForceComp->ImpulseStrength = 5000;
+	RadialForceComp->Radius = 700;
+	RadialForceComp->bImpulseVelChange = true;
+	RadialForceComp->ImpulseStrength = 1500;
 
 }
 
@@ -28,7 +30,7 @@ AACTBarrel::AACTBarrel()
 void AACTBarrel::BeginPlay()
 {
 	Super::BeginPlay();
-	StaticMeshComp->OnComponentHit.AddDynamic(this,&AACTBarrel::OnBarrelHit);
+	StaticMeshComp->OnComponentHit.AddDynamic(this,&AACTBarrel::OnActorHit);
 	
 }
 
@@ -38,9 +40,11 @@ void AACTBarrel::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AACTBarrel::OnBarrelHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+void AACTBarrel::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
 	RadialForceComp->FireImpulse();
+	FString CombinedString(TEXT("Boom!"));
+	DrawDebugString(GetWorld(),Hit.ImpactPoint,CombinedString,nullptr,FColor::Green,2.0f,false);
 }
 

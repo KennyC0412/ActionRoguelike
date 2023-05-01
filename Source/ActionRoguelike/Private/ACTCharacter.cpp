@@ -3,6 +3,7 @@
 
 #include "ACTCharacter.h"
 
+#include "ACTAttributeComponent.h"
 #include "ACTInteractionComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -19,10 +20,12 @@ AACTCharacter::AACTCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
 
+	InteractionComp = CreateDefaultSubobject<UACTInteractionComponent>("InteractionComp");
+
+	AttributeComp = CreateDefaultSubobject<UACTAttributeComponent>("AttributeComp");
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
-
-	InteractionComp = CreateDefaultSubobject<UACTInteractionComponent>("InteractionComp");
 }
 
 // Called when the game starts or when spawned
@@ -49,34 +52,75 @@ void AACTCharacter::MoveRight(float value)
 	AddMovementInput(RightVecator,value);
 }
 
-void AACTCharacter::PrimaryAttack_TimeElapsed()
+void AACTCharacter::DashAttack_TimeElapsed()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	
-	FTransform SpawnTM = FTransform(GetControlRotation(),HandLocation);
-	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-	
-	GetWorld()->SpawnActor<AActor>(ProjectileClass,SpawnTM,SpawnParams);
+	SpawnProjectile(DashProjectileClass);
 }
 
-void AACTCharacter::PrimaryAttack()
+void AACTCharacter::NormalAttack_TimeElapsed()
+{
+	SpawnProjectile(NormalProjectileClass);
+}
+
+void AACTCharacter::MagicAttack_TimeElapsed()
+{
+	SpawnProjectile(MagicProjectileClass);
+}
+
+void AACTCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
+{
+	if(ensureAlways(ClassToSpawn))
+	{
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+		SpawnParams.Owner = this;
+		
+		FCollisionShape Shape;
+		Shape.SetSphere(20.0f);
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		FCollisionObjectQueryParams ObjParams;
+		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
+		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
+	
+		FVector TraceStart = CameraComp->GetComponentLocation();
+		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
+
+		FHitResult Hit;
+
+		if(GetWorld()->SweepSingleByObjectType(Hit,TraceStart,TraceEnd,FQuat::Identity,ObjParams,Shape,Params))
+		{
+			TraceEnd = Hit.ImpactPoint;
+		}
+
+		FRotator ProjectileRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
+	
+		FTransform SpawnTM = FTransform(ProjectileRotation,HandLocation);
+		GetWorld()->SpawnActor<AActor>(ClassToSpawn,SpawnTM,SpawnParams);
+	}
+}
+
+void AACTCharacter::NormalAttack()
 {
 	PlayAnimMontage(AttackAnim);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&AACTCharacter::PrimaryAttack_TimeElapsed,0.2f);
-	//GetWorldTimerManager().Clear(TimerHandle_PrimaryAttack);
-	return ;
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	
-	FTransform SpawnTM = FTransform(GetControlRotation(),HandLocation);
-	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	
-	GetWorld()->SpawnActor<AActor>(ProjectileClass,SpawnTM,SpawnParams);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&AACTCharacter::NormalAttack_TimeElapsed,0.2f);
+}
+
+void AACTCharacter::MagicAttack()
+{
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&AACTCharacter::MagicAttack_TimeElapsed,0.2f);
+}
+
+void AACTCharacter::DashAttack()
+{
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&AACTCharacter::DashAttack_TimeElapsed,0.2f);
 }
 
 void AACTCharacter::PrimaryInteract()
@@ -104,7 +148,10 @@ void AACTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("LookUp",this,&APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("MoveRight",this,&AACTCharacter::MoveRight);
 
-	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed,this,&AACTCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed,this,&AACTCharacter::NormalAttack);
+	PlayerInputComponent->BindAction("MagicAttack",IE_Pressed,this,&AACTCharacter::MagicAttack);
+	PlayerInputComponent->BindAction("Dash",IE_Pressed,this,&AACTCharacter::DashAttack);
+
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&AACTCharacter::Jump);
 	PlayerInputComponent->BindAction("Execute",IE_Pressed,InteractionComp,&UACTInteractionComponent::PrimaryInteract);
 
