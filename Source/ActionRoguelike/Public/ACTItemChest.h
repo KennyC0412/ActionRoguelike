@@ -24,11 +24,17 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-		UStaticMeshComponent* BaseMesh;
+	UStaticMeshComponent* BaseMesh;
 
-	UPROPERTY(VisibleAnywhere)
-		UStaticMeshComponent* LidMesh;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	UStaticMeshComponent* LidMesh;
 
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	UStaticMeshComponent* GoldMesh;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	UParticleSystemComponent* ParticleSystemComp;
+	
 	UPROPERTY(EditDefaultsOnly)
 	bool IsClosed = true;
 	

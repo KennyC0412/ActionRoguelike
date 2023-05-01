@@ -3,8 +3,10 @@
 
 #include "ACTItemChest.h"
 
+#include "Particles/ParticleSystemComponent.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogChest,All,All)
+
+DEFINE_LOG_CATEGORY_STATIC(LogChest, All, All)
 
 // Sets default values
 AACTItemChest::AACTItemChest()
@@ -18,6 +20,11 @@ AACTItemChest::AACTItemChest()
 	LidMesh = CreateDefaultSubobject<UStaticMeshComponent>("LidMesh");
 	LidMesh->SetupAttachment(RootComponent);
 
+	GoldMesh = CreateDefaultSubobject<UStaticMeshComponent>("GoldMesh");
+	GoldMesh->SetupAttachment(RootComponent);
+
+	ParticleSystemComp = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystemComp");
+	ParticleSystemComp->SetupAttachment(GoldMesh);
 	TargetPitch = 110.0f;
 }
 
@@ -26,6 +33,7 @@ void AACTItemChest::Interact_Implementation(APawn* InstigatorPawn)
 	if(IsClosed)
 	{
 		LidMesh->SetRelativeRotation(FRotator(TargetPitch,0,0));
+		ParticleSystemComp->Activate();
 		IsClosed = false;
 	}
 	else

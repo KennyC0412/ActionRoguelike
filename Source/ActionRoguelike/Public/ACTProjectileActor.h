@@ -28,11 +28,18 @@ protected:
 	UPROPERTY(VisibleAnyWhere)
 	UParticleSystemComponent* EffectComp;
 
-
+	UPROPERTY(VisibleAnyWhere)
+	UParticleSystemComponent* ExplosionComp;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void Destroy();
 
-public:	
+public:
+
+	FTimerHandle DestroyTimerHandle;
+	
+	UFUNCTION()
+	void OnProjectileHit(UPrimitiveComponent *HitComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit);
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

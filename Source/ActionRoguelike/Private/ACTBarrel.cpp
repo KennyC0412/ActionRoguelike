@@ -28,11 +28,19 @@ AACTBarrel::AACTBarrel()
 void AACTBarrel::BeginPlay()
 {
 	Super::BeginPlay();
+	StaticMeshComp->OnComponentHit.AddDynamic(this,&AACTBarrel::OnBarrelHit);
+	
 }
 
 // Called every frame
 void AACTBarrel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AACTBarrel::OnBarrelHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	RadialForceComp->FireImpulse();
 }
 

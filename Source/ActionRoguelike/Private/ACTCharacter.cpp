@@ -49,7 +49,7 @@ void AACTCharacter::MoveRight(float value)
 	AddMovementInput(RightVecator,value);
 }
 
-void AACTCharacter::PrimaryAttack_TimeElapsed() const
+void AACTCharacter::PrimaryAttack_TimeElapsed()
 {
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 	
@@ -57,6 +57,7 @@ void AACTCharacter::PrimaryAttack_TimeElapsed() const
 	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
 	
 	GetWorld()->SpawnActor<AActor>(ProjectileClass,SpawnTM,SpawnParams);
 }
