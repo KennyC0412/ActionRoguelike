@@ -40,7 +40,7 @@ AACTMagicProjectile::AACTMagicProjectile()
 void AACTMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	SphereComp->IgnoreActorWhenMoving(GetOwner(),true);
+	SphereComp->IgnoreActorWhenMoving(GetInstigator(),true);
 	SphereComp->OnComponentHit.AddDynamic(this,&AACTMagicProjectile::OnActorHit);
 	
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle,this,&AACTMagicProjectile::Destroy,5.0f);

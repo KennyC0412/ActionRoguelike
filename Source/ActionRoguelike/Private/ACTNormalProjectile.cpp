@@ -42,6 +42,7 @@ void AACTNormalProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor*
 {
 	if(Hit.bBlockingHit)
 	{
+		UE_LOG(LogNormal,Display,TEXT("Hit : %s"),*(Hit.Actor->GetName()));
 		ProjectileMovementComp->StopMovementImmediately();
 		SphereComp->SetVisibility(false);
 		EffectComp->SetVisibility(false);
@@ -52,9 +53,10 @@ void AACTNormalProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor*
 
 void AACTNormalProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-
 	if(!OtherActor) return;
-	if(OtherActor == GetOwner()) return;
+	if(OtherActor == GetInstigator()) return;
+	UE_LOG(LogNormal,Display,TEXT("Overlap : %s"),*(OtherActor->GetName()));
+
 	UACTAttributeComponent* AttributeComp = Cast<UACTAttributeComponent>(OtherActor->GetComponentByClass(UACTAttributeComponent::StaticClass()));
 	if(!AttributeComp) return;
 	AttributeComp->ApplyHealthChange(-20.0f);

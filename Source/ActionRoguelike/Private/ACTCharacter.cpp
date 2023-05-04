@@ -76,7 +76,7 @@ void AACTCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.Instigator = this;
-		SpawnParams.Owner = this;
+		//SpawnParams.Owner = this;
 		
 		FCollisionShape Shape;
 		Shape.SetSphere(20.0f);
@@ -155,5 +155,20 @@ void AACTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&AACTCharacter::Jump);
 	PlayerInputComponent->BindAction("Execute",IE_Pressed,InteractionComp,&UACTInteractionComponent::PrimaryInteract);
 
+}
+
+void AACTCharacter::OnHealthChanged(AActor* OtherActor, UACTAttributeComponent* OtherComp, float NewHealth, float Delta)
+{
+	if(NewHealth <= 0.0f && Delta < 0.0f)
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		DisableInput(PlayerController);
+	}
+}
+
+void AACTCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	AttributeComp->OnHealthChanged.AddDynamic(this,&AACTCharacter::OnHealthChanged);
 }
 
