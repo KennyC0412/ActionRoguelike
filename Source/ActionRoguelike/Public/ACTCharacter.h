@@ -76,4 +76,6 @@ public:
 	void OnHealthChanged(AActor* OtherActor, UACTAttributeComponent* OtherComp, float NewHealth,float Delta);
 
 	virtual void PostInitializeComponents() override;
+
+	UACTAttributeComponent* GetAttrributeComp() { return AttributeComp; }
 };

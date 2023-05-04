@@ -23,7 +23,16 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
 	UParticleSystem* ImpactVFX;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VFX")
+	UParticleSystem* CastSpellVFX;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "SOUND")
+	USoundBase* SoundBase;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	TSubclassOf<UCameraShakeBase> CameraShake;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	USphereComponent* SphereComp;
 
@@ -33,6 +42,11 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	UParticleSystemComponent* EffectComp;
 
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
+	UAudioComponent* ProjectileLoopAudioComp;
+	
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
+	UAudioComponent* ProjectileImpactAudioComp;
 	UFUNCTION()
 	virtual void OnActorHit(UPrimitiveComponent *HitComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit);
 

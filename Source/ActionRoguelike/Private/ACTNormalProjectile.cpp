@@ -4,8 +4,10 @@
 #include "ACTNormalProjectile.h"
 
 #include "ACTAttributeComponent.h"
+#include "ACTCharacter.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogNormal,All,All)
@@ -34,6 +36,11 @@ void AACTNormalProjectile::BeginPlay()
 	SphereComp->OnComponentHit.AddDynamic(this,&AACTNormalProjectile::OnActorHit);
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this,&AACTNormalProjectile::OnActorOverlap);
 
+	AACTCharacter* Character = Cast<AACTCharacter>(GetInstigator());
+	if(Character && CastSpellVFX)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),CastSpellVFX,Character->GetMesh()->GetSocketLocation("Muzzle_01"));
+	}
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle,this,&AACTNormalProjectile::Destroy,5.0f);
 }
 
@@ -44,8 +51,7 @@ void AACTNormalProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor*
 	{
 		UE_LOG(LogNormal,Display,TEXT("Hit : %s"),*(Hit.Actor->GetName()));
 		ProjectileMovementComp->StopMovementImmediately();
-		SphereComp->SetVisibility(false);
-		EffectComp->SetVisibility(false);
+		UGameplayStatics::PlayWorldCameraShake(GetWorld(),CameraShake,Hit.ImpactPoint,0.0f,500.0f);
 		Explode();
 		GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 	}

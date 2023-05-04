@@ -3,6 +3,7 @@
 
 #include "ACTProjectileBase.h"
 
+#include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -25,6 +26,14 @@ AACTProjectileBase::AACTProjectileBase()
 	ProjectileMovementComp->ProjectileGravityScale = 0.0f;
 
 	ImpactVFX = CreateDefaultSubobject<UParticleSystem>("ImpactVFX");
+	CastSpellVFX = CreateDefaultSubobject<UParticleSystem>("CastSpellVFX");
+	
+	ProjectileLoopAudioComp = CreateDefaultSubobject<UAudioComponent>("ProjectileLoopAudioComp");
+	ProjectileLoopAudioComp->SetupAttachment(RootComponent);
+
+	/*ProjectileImpactAudioComp = CreateDefaultSubobject<UAudioComponent>("ProjectileImpactAudioComp");
+	ProjectileImpactAudioComp->SetupAttachment(RootComponent);
+	ProjectileImpactAudioComp->bAutoActivate = false;*/
 }
 
 void AACTProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
@@ -38,6 +47,8 @@ void AACTProjectileBase::Explode_Implementation()
 	if(ensure(!IsPendingKill()))
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(this,ImpactVFX,GetActorLocation(),GetActorRotation());
+		ProjectileLoopAudioComp->Deactivate();
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(),SoundBase,GetActorLocation());
 		Destroy();
 	}
 }

@@ -17,10 +17,15 @@ bool UACTAttributeComponent::IsAlive() const
 	return Health > 0.0f;
 }
 
+bool UACTAttributeComponent::IsFull() const
+{
+	return Health >= HealthMax;
+}
+
 
 bool UACTAttributeComponent::ApplyHealthChange(float Delta)
 {
-	Health += Delta;
+	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
 	OnHealthChanged.Broadcast(nullptr,this,Health,Delta);
 	return true;
