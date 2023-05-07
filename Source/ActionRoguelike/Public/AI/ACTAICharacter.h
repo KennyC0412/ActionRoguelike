@@ -6,21 +6,32 @@
 #include "GameFramework/Character.h"
 #include "ACTAICharacter.generated.h"
 
+class UACTAttributeComponent;
+class UPawnSensingComponent;
+
 UCLASS()
 class ACTIONROGUELIKE_API AACTAICharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AACTAICharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere)
+	UPawnSensingComponent* PawnSensingComp;
+
+	UPROPERTY(VisibleAnywhere)
+	UACTAttributeComponent* AttributeComp;
+		
+	UFUNCTION()
+	void OnPawnSeen(APawn* Pawn);
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* OtherActor, UACTAttributeComponent* OtherComp, float NewHealth, float Delta);
+
+	virtual void PostInitializeComponents() override;
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

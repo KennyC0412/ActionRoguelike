@@ -25,9 +25,12 @@ bool UACTAttributeComponent::IsFull() const
 
 bool UACTAttributeComponent::ApplyHealthChange(float Delta)
 {
+	float OldHealth = Health;
+	
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
-	OnHealthChanged.Broadcast(nullptr,this,Health,Delta);
+	float ActualDelta = Health - OldHealth;
+	OnHealthChanged.Broadcast(nullptr,this,Health,ActualDelta);
 	return true;
 }
 

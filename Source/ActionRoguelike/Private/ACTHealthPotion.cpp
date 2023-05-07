@@ -11,6 +11,8 @@ AACTHealthPotion::AACTHealthPotion()
 	PrimaryActorTick.bCanEverTick = true;
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
 	RootComponent = StaticMesh;
+
+	RespawnTime = 10.0f;
 }
 
 // Called when the game starts or when spawned
@@ -24,7 +26,8 @@ void AACTHealthPotion::BeginPlay()
 void AACTHealthPotion::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	Yaw = Yaw + 2.0f;
+	StaticMesh->SetWorldRotation(FRotator(0,Yaw,0));
 }
 
 void AACTHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
@@ -39,14 +42,19 @@ void AACTHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		if (AttrComp && !AttrComp->IsFull())
 		{
 			AttrComp->ApplyHealthChange(20);
-			StaticMesh->SetVisibility(false);
-			GetWorldTimerManager().SetTimer(VisibilityTimerHandle, this, &AACTHealthPotion::ResetVisibility, 10.0f);
+			ResetVisibility(false);
+			GetWorldTimerManager().SetTimer(VisibilityTimerHandle, this, &AACTHealthPotion::ShowUp, RespawnTime);
 		}
 	}
 }
 
-void AACTHealthPotion::ResetVisibility()
+void AACTHealthPotion::ShowUp()
 {
-	StaticMesh->SetVisibility(true);
+	ResetVisibility(true);
+}
 
+void AACTHealthPotion::ResetVisibility(bool bIsActive)
+{
+	SetActorEnableCollision(bIsActive);
+	RootComponent->SetVisibility(bIsActive,true);
 }

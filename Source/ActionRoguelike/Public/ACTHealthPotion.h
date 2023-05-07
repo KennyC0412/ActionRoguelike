@@ -17,8 +17,9 @@ class ACTIONROGUELIKE_API AACTHealthPotion : public AActor, public IACTGameplayI
 public:	
 
 	void Interact_Implementation(APawn* InstigatorPawn);
+	void ShowUp();
 
-	void ResetVisibility();
+	void ResetVisibility(bool bIsActive);
 	// Sets default values for this actor's properties
 	AACTHealthPotion();
 
@@ -32,6 +33,11 @@ protected:
 
 	FTimerHandle VisibilityTimerHandle;
 
+	UPROPERTY(EditDefaultsOnly)
+	float RespawnTime;
+
+	float Yaw = 0.0f;
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

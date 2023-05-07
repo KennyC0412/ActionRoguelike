@@ -71,7 +71,7 @@ void AACTCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 {
 	if(ensureAlways(ClassToSpawn))
 	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
 
 		
 		FActorSpawnParameters SpawnParams;
@@ -89,7 +89,7 @@ void AACTCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
 		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
-	
+		
 		FVector TraceStart = CameraComp->GetComponentLocation();
 		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
 
@@ -116,11 +116,13 @@ void AACTCharacter::NormalAttack()
 
 void AACTCharacter::MagicAttack()
 {
+	PlayAnimMontage(AttackAnim);
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&AACTCharacter::MagicAttack_TimeElapsed,0.2f);
 }
 
 void AACTCharacter::DashAttack()
 {
+	PlayAnimMontage(AttackAnim);
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&AACTCharacter::DashAttack_TimeElapsed,0.2f);
 }
 

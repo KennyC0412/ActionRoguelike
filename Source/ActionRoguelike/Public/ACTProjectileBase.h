@@ -57,6 +57,8 @@ protected:
 
 	FTimerHandle DestroyTimerHandle;
 
+	UPROPERTY(EditDefaultsOnly)
+	float DamageCount = 20.0f;
 public:
 	
 	// Called every frame

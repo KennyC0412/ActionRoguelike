@@ -3,26 +3,61 @@
 
 #include "AI/ACTAICharacter.h"
 
+#include "ACTAttributeComponent.h"
+#include "AIController.h"
+#include "BrainComponent.h"
+#include "DrawDebugHelpers.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Perception/PawnSensingComponent.h"
+
 // Sets default values
 AACTAICharacter::AACTAICharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
+	AttributeComp = CreateDefaultSubobject<UACTAttributeComponent>("AttributeComp");
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
-// Called when the game starts or when spawned
-void AACTAICharacter::BeginPlay()
+void AACTAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	Super::BeginPlay();
-	
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if(ensure(AIController))
+	{
+		UBlackboardComponent* BlackboardComponent = AIController->GetBlackboardComponent();
+		BlackboardComponent->SetValueAsObject("TargetActor",Pawn);
+		DrawDebugString(GetWorld(),GetActorLocation(),"Player Spotted",nullptr,FColor::White,4.0f,true);
+	}
 }
 
-// Called every frame
-void AACTAICharacter::Tick(float DeltaTime)
+void AACTAICharacter::OnHealthChanged(AActor* OtherActor, UACTAttributeComponent* OtherComp, float NewHealth, float Delta)
 {
-	Super::Tick(DeltaTime);
-
+	if(Delta < 0.0f)
+	{
+		if(NewHealth <= 0.0f)
+		{
+			//Stop BT
+			AAIController* AIC = Cast<AAIController>(GetController());
+			if(AIC)
+			{
+				AIC->GetBrainComponent()->StopLogic("Killed");
+			}
+			//ragdoll
+			GetMesh()->SetAllBodiesSimulatePhysics(true);
+			GetMesh()->SetCollisionProfileName("Ragdoll");
+			//GetMesh()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+			//Set lifespan
+			SetLifeSpan(5.0f);
+		}
+	}
 }
+
+void AACTAICharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	PawnSensingComp->OnSeePawn.AddDynamic(this,&AACTAICharacter::OnPawnSeen);
+	AttributeComp->OnHealthChanged.AddDynamic(this,&AACTAICharacter::OnHealthChanged);
+}
+
+
 
 

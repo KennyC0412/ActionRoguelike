@@ -24,7 +24,6 @@ AACTNormalProjectile::AACTNormalProjectile()
 	ProjectileMovementComp->bRotationFollowsVelocity = true;
 	ProjectileMovementComp->bInitialVelocityInLocalSpace = true;
 	ProjectileMovementComp->ProjectileGravityScale = 0.0f;
-
 }
 
 // Called when the game starts or when spawned
@@ -32,14 +31,15 @@ void AACTNormalProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SphereComp->MoveIgnoreActors.Add(GetOwner());
+	SphereComp->MoveIgnoreActors.Add(GetInstigator());
+	SphereComp->IgnoreActorWhenMoving(GetInstigator(),true);
 	SphereComp->OnComponentHit.AddDynamic(this,&AACTNormalProjectile::OnActorHit);
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this,&AACTNormalProjectile::OnActorOverlap);
 
 	AACTCharacter* Character = Cast<AACTCharacter>(GetInstigator());
 	if(Character && CastSpellVFX)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),CastSpellVFX,Character->GetMesh()->GetSocketLocation("Muzzle_01"));
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),CastSpellVFX,Character->GetMesh()->GetSocketLocation(Character->HandSocketName));
 	}
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle,this,&AACTNormalProjectile::Destroy,5.0f);
 }
@@ -49,7 +49,7 @@ void AACTNormalProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor*
 {
 	if(Hit.bBlockingHit)
 	{
-		UE_LOG(LogNormal,Display,TEXT("Hit : %s"),*(Hit.Actor->GetName()));
+		//UE_LOG(LogNormal,Display,TEXT("Hit : %s"),*(Hit.Actor->GetName()));
 		ProjectileMovementComp->StopMovementImmediately();
 		UGameplayStatics::PlayWorldCameraShake(GetWorld(),CameraShake,Hit.ImpactPoint,0.0f,500.0f);
 		Explode();
@@ -61,10 +61,10 @@ void AACTNormalProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedCompone
 {
 	if(!OtherActor) return;
 	if(OtherActor == GetInstigator()) return;
-	UE_LOG(LogNormal,Display,TEXT("Overlap : %s"),*(OtherActor->GetName()));
+	//UE_LOG(LogNormal,Display,TEXT("Overlap : %s"),*(OtherActor->GetName()));
 
 	UACTAttributeComponent* AttributeComp = Cast<UACTAttributeComponent>(OtherActor->GetComponentByClass(UACTAttributeComponent::StaticClass()));
 	if(!AttributeComp) return;
-	AttributeComp->ApplyHealthChange(-20.0f);
+	AttributeComp->ApplyHealthChange(-DamageCount);
 	Destroy();
 }
