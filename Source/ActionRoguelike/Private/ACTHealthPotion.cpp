@@ -41,7 +41,7 @@ void AACTHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		UACTAttributeComponent* AttrComp = Character->GetAttrributeComp();
 		if (AttrComp && !AttrComp->IsFull())
 		{
-			AttrComp->ApplyHealthChange(20);
+			AttrComp->ApplyHealthChange(this, 20);
 			ResetVisibility(false);
 			GetWorldTimerManager().SetTimer(VisibilityTimerHandle, this, &AACTHealthPotion::ShowUp, RespawnTime);
 		}

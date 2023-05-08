@@ -19,12 +19,17 @@ public:
 
 protected:
 
+	void SetTargetActor(AActor* NewTarget);
+	
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensingComp;
 
 	UPROPERTY(VisibleAnywhere)
 	UACTAttributeComponent* AttributeComp;
-		
+
+	UPROPERTY(VisibleAnywhere)
+	FName TimeToHitParamName;
+	
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
 

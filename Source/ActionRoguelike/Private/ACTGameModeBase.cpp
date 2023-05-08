@@ -43,7 +43,8 @@ void AACTGameModeBase::SpawnBotTimerElaspsed()
 	{
 		AACTAICharacter* Bot = *It;
 
-		UACTAttributeComponent* AttributeComp = Cast<UACTAttributeComponent>(Bot->GetComponentByClass(UACTAttributeComponent::StaticClass()));
+		
+		UACTAttributeComponent* AttributeComp = UACTAttributeComponent::GetAttributes(Bot);
 		if(AttributeComp && AttributeComp->IsAlive())
 		{
 			NrOfAliveBots++;

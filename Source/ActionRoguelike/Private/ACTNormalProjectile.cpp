@@ -52,6 +52,11 @@ void AACTNormalProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor*
 		//UE_LOG(LogNormal,Display,TEXT("Hit : %s"),*(Hit.Actor->GetName()));
 		ProjectileMovementComp->StopMovementImmediately();
 		UGameplayStatics::PlayWorldCameraShake(GetWorld(),CameraShake,Hit.ImpactPoint,0.0f,500.0f);
+		UACTAttributeComponent* AttributeComp = UACTAttributeComponent::GetAttributes(OtherActor);
+		if(AttributeComp)
+		{
+			AttributeComp->ApplyHealthChange(GetInstigator(),-DamageCount);
+		}
 		Explode();
 		GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
 	}
@@ -65,6 +70,6 @@ void AACTNormalProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedCompone
 
 	UACTAttributeComponent* AttributeComp = Cast<UACTAttributeComponent>(OtherActor->GetComponentByClass(UACTAttributeComponent::StaticClass()));
 	if(!AttributeComp) return;
-	AttributeComp->ApplyHealthChange(-DamageCount);
+	AttributeComp->ApplyHealthChange(GetInstigator(),-DamageCount);
 	Destroy();
 }

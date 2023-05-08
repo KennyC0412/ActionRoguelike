@@ -16,23 +16,36 @@ AACTAICharacter::AACTAICharacter()
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	AttributeComp = CreateDefaultSubobject<UACTAttributeComponent>("AttributeComp");
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	TimeToHitParamName = "TimeToHit";
 }
 
-void AACTAICharacter::OnPawnSeen(APawn* Pawn)
+void AACTAICharacter::SetTargetActor(AActor* NewTarget)
 {
 	AAIController* AIController = Cast<AAIController>(GetController());
 	if(ensure(AIController))
 	{
-		UBlackboardComponent* BlackboardComponent = AIController->GetBlackboardComponent();
-		BlackboardComponent->SetValueAsObject("TargetActor",Pawn);
-		DrawDebugString(GetWorld(),GetActorLocation(),"Player Spotted",nullptr,FColor::White,4.0f,true);
+		AIController->GetBlackboardComponent()->SetValueAsObject("TargetActor",NewTarget);
 	}
 }
 
-void AACTAICharacter::OnHealthChanged(AActor* OtherActor, UACTAttributeComponent* OtherComp, float NewHealth, float Delta)
+void AACTAICharacter::OnPawnSeen(APawn* Pawn)
 {
+	SetTargetActor(Pawn);
+	DrawDebugString(GetWorld(),GetActorLocation(),"Player Spotted",nullptr,FColor::White,4.0f,true);
+}
+
+void AACTAICharacter::OnHealthChanged(AActor* InstigatorActor, UACTAttributeComponent* OtherComp, float NewHealth, float Delta)
+{
+	
 	if(Delta < 0.0f)
 	{
+		if(InstigatorActor != this)
+		{
+			SetTargetActor(InstigatorActor);
+		}
+		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit",GetWorld()->TimeSeconds);
+		//GetMesh()->SetScalarParameterValueOnMaterials("HitFlashSpeed",10);
+		
 		if(NewHealth <= 0.0f)
 		{
 			//Stop BT
