@@ -4,6 +4,7 @@
 #include "AI/ACTAICharacter.h"
 
 #include "ACTAttributeComponent.h"
+#include "ACTWorldUserWidget.h"
 #include "AIController.h"
 #include "BrainComponent.h"
 #include "DrawDebugHelpers.h"
@@ -43,6 +44,17 @@ void AACTAICharacter::OnHealthChanged(AActor* InstigatorActor, UACTAttributeComp
 		{
 			SetTargetActor(InstigatorActor);
 		}
+
+		if(ActiveHealthBar == nullptr)
+		{
+			ActiveHealthBar = CreateWidget<UACTWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+            if(ActiveHealthBar)
+            {
+            	ActiveHealthBar->AttachedActor = this;
+            	ActiveHealthBar->AddToViewport();
+            }
+		}
+		
 		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit",GetWorld()->TimeSeconds);
 		//GetMesh()->SetScalarParameterValueOnMaterials("HitFlashSpeed",10);
 		
@@ -58,6 +70,7 @@ void AACTAICharacter::OnHealthChanged(AActor* InstigatorActor, UACTAttributeComp
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			GetMesh()->SetCollisionProfileName("Ragdoll");
 			//GetMesh()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+			
 			//Set lifespan
 			SetLifeSpan(5.0f);
 		}

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ACTAICharacter.generated.h"
 
+class UACTWorldUserWidget;
 class UACTAttributeComponent;
 class UPawnSensingComponent;
 
@@ -20,6 +21,12 @@ public:
 protected:
 
 	void SetTargetActor(AActor* NewTarget);
+
+	UPROPERTY(VisibleAnywhere)
+	UACTWorldUserWidget* ActiveHealthBar;
+
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 	
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensingComp;

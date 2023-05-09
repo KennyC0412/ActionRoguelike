@@ -33,6 +33,7 @@ void AACTNormalProjectile::BeginPlay()
 
 	SphereComp->MoveIgnoreActors.Add(GetInstigator());
 	SphereComp->IgnoreActorWhenMoving(GetInstigator(),true);
+
 	SphereComp->OnComponentHit.AddDynamic(this,&AACTNormalProjectile::OnActorHit);
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this,&AACTNormalProjectile::OnActorOverlap);
 
@@ -47,15 +48,17 @@ void AACTNormalProjectile::BeginPlay()
 void AACTNormalProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if(!OtherActor) return;
+	if(OtherActor == GetInstigator()) return;
 	if(Hit.bBlockingHit)
 	{
-		//UE_LOG(LogNormal,Display,TEXT("Hit : %s"),*(Hit.Actor->GetName()));
+		UE_LOG(LogNormal,Display,TEXT("Hit : %s"),*(OtherActor->GetName()));
 		ProjectileMovementComp->StopMovementImmediately();
 		UGameplayStatics::PlayWorldCameraShake(GetWorld(),CameraShake,Hit.ImpactPoint,0.0f,500.0f);
 		UACTAttributeComponent* AttributeComp = UACTAttributeComponent::GetAttributes(OtherActor);
 		if(AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(GetInstigator(),-DamageCount);
+			AttributeComp->ApplyHealthChange(OtherActor,-DamageCount);
 		}
 		Explode();
 		GetWorldTimerManager().ClearTimer(DestroyTimerHandle);
@@ -66,10 +69,10 @@ void AACTNormalProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedCompone
 {
 	if(!OtherActor) return;
 	if(OtherActor == GetInstigator()) return;
-	//UE_LOG(LogNormal,Display,TEXT("Overlap : %s"),*(OtherActor->GetName()));
+	UE_LOG(LogNormal,Display,TEXT("Overlap : %s"),*(OtherActor->GetName()));
 
 	UACTAttributeComponent* AttributeComp = Cast<UACTAttributeComponent>(OtherActor->GetComponentByClass(UACTAttributeComponent::StaticClass()));
 	if(!AttributeComp) return;
-	AttributeComp->ApplyHealthChange(GetInstigator(),-DamageCount);
+	AttributeComp->ApplyHealthChange(OtherActor,-DamageCount);
 	Destroy();
 }
