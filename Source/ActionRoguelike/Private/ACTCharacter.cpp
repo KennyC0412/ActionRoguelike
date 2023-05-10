@@ -5,6 +5,8 @@
 
 #include "ACTAttributeComponent.h"
 #include "ACTInteractionComponent.h"
+#include "EngineUtils.h"
+#include "AI/ACTAICharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -173,5 +175,28 @@ void AACTCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	AttributeComp->OnHealthChanged.AddDynamic(this,&AACTCharacter::OnHealthChanged);
+}
+
+void AACTCharacter::HealSelf(float Amount)
+{
+	AttributeComp->ApplyHealthChange(this,Amount);
+}
+
+void AACTCharacter::KillSelf()
+{
+	AttributeComp->ApplyHealthChange(this, -100);
+}
+
+void AACTCharacter::KillAllAI()
+{
+	for(TActorIterator<AACTAICharacter> It(GetWorld());It; ++It)
+	{
+		AACTAICharacter* Bot = *It;
+		UACTAttributeComponent* AIAttributeComp = UACTAttributeComponent::GetAttributes(Bot);
+		if(ensure(AIAttributeComp) && AIAttributeComp->IsAlive())
+		{
+			AIAttributeComp->ApplyHealthChange(Bot,-100);			
+		}
+	}
 }
 

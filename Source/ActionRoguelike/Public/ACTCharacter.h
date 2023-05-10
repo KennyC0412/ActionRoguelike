@@ -82,4 +82,13 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	UACTAttributeComponent* GetAttrributeComp() { return AttributeComp; }
+
+	UFUNCTION(Exec)
+	void HealSelf(float Amount = 100);
+
+	UFUNCTION(Exec)
+	void KillSelf();
+
+	UFUNCTION(Exec)
+	void KillAllAI();
 };
