@@ -65,3 +65,17 @@ void AACTGameModeBase::SpawnBotTimerElaspsed()
 		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&AACTGameModeBase::OnQueryCompleted);
 	}
 }
+
+
+void AACTGameModeBase::KillAllAI()
+{
+	for(TActorIterator<AACTAICharacter> It(GetWorld());It; ++It)
+	{
+		AACTAICharacter* Bot = *It;
+		UACTAttributeComponent* AIAttributeComp = UACTAttributeComponent::GetAttributes(Bot);
+		if(ensure(AIAttributeComp) && AIAttributeComp->IsAlive())
+		{
+			AIAttributeComp->Kill(Bot);			
+		}
+	}
+}

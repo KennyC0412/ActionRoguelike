@@ -12,6 +12,11 @@ UACTAttributeComponent::UACTAttributeComponent()
 	Health = 100.0f;
 }
 
+bool UACTAttributeComponent::Kill(AActor* InstigatorActor)
+{
+	return ApplyHealthChange(InstigatorActor,-HealthMax);
+}
+
 bool UACTAttributeComponent::IsAlive() const
 {
 	return Health > 0.0f;

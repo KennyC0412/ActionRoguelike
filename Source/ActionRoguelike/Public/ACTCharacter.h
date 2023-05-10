@@ -89,6 +89,4 @@ public:
 	UFUNCTION(Exec)
 	void KillSelf();
 
-	UFUNCTION(Exec)
-	void KillAllAI();
 };
