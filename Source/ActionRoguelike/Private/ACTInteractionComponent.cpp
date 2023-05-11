@@ -6,6 +6,7 @@
 #include "ACTGameplayInterface.h"
 #include "DrawDebugHelpers.h"
 
+static TAutoConsoleVariable<bool> CVarEnableDebugDraw(TEXT("act.EnableDebugDraw"),false,TEXT("Enable draw debug line and sphere for interact component"),ECVF_Cheat);
 
 DEFINE_LOG_CATEGORY_STATIC(LogInteraction, All, All)
 
@@ -32,6 +33,7 @@ void UACTInteractionComponent::BeginPlay()
 
 void UACTInteractionComponent::PrimaryInteract()
 {
+	bool bDebugDraw = CVarEnableDebugDraw.GetValueOnGameThread();
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 
@@ -62,7 +64,10 @@ void UACTInteractionComponent::PrimaryInteract()
 		AActor* HitActor = HitResult.GetActor();
 		if(HitActor)
 		{
-			DrawDebugSphere(GetWorld(),HitResult.ImpactPoint,Radius,32,LineColor,false,2.0f);
+			if(bDebugDraw)
+			{
+				DrawDebugSphere(GetWorld(),HitResult.ImpactPoint,Radius,32,LineColor,false,2.0f);
+			}
 			if(HitActor->Implements<UACTGameplayInterface>())
 			{
 				APawn* InstigatorPawn = Cast<APawn>(Owner);
@@ -72,8 +77,11 @@ void UACTInteractionComponent::PrimaryInteract()
 			}
 		}
 	}
-
-	DrawDebugLine(GetWorld(),EyeLocation,End,LineColor,false,3.0f,0,5.0f);
+	
+	if(bDebugDraw)
+	{
+		DrawDebugLine(GetWorld(),EyeLocation,End,LineColor,false,3.0f,0,5.0f);
+	}
 }
 
 // Called every frame

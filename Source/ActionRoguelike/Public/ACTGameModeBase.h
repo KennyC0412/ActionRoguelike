@@ -32,14 +32,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="AI")
 	TSubclassOf<AActor> MinionClass;
 public:
-	
+
+	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
 	virtual void StartPlay() override;
-	UFUNCTION()
 	
+	UFUNCTION()
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 	
-	void SpawnBotTimerElaspsed();
+	void SpawnBotTimerElapsed();
 
+	UFUNCTION(BlueprintCallable)
+	void RespawnPlayerElapsed(APlayerController* Controller);
+	
 	UFUNCTION(Exec)
 	void KillAllAI();
 };

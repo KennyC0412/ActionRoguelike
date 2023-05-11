@@ -3,6 +3,11 @@
 
 #include "ACTAttributeComponent.h"
 
+#include "ACTGameModeBase.h"
+
+static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("act.DamageMultiplier"),1.0f,TEXT("Global damage modifier for attribute component"),ECVF_Cheat);
+
+
 // Sets default values for this component's properties
 UACTAttributeComponent::UACTAttributeComponent()
 {
@@ -42,12 +47,27 @@ bool UACTAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float De
 		return false;
 	}
 	
+	if(Delta <= 0.0f)
+	{
+		float DamageMultiplier = CVarDamageMultiplier.GetValueOnGameThread();
+		Delta *= DamageMultiplier;
+	}
+	
 	float OldHealth = Health;
 	
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
 	float ActualDelta = Health - OldHealth;
 	OnHealthChanged.Broadcast(InstigatorActor,this,Health,ActualDelta);
+
+	if(ActualDelta < 0.0f && Health == 0.0f)
+	{
+		AACTGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AACTGameModeBase>();
+		if(GameMode)
+		{
+			GameMode->OnActorKilled(GetOwner(),InstigatorActor);
+		}
+	}
 	return true;
 }
 
