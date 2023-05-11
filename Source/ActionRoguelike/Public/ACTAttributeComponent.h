@@ -32,10 +32,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
 	float HealthMax;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
+	float LowHealth;
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	bool Kill(AActor* InstigatorActor);
 
+	UFUNCTION(BlueprintCallable)
+	bool IsLowHealth() const;
 	
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;

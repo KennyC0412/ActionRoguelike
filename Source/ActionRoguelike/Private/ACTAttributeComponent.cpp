@@ -10,11 +10,18 @@ UACTAttributeComponent::UACTAttributeComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 	Health = 100.0f;
+	HealthMax = 100.0f;
+	LowHealth = 30.0f;
 }
 
 bool UACTAttributeComponent::Kill(AActor* InstigatorActor)
 {
 	return ApplyHealthChange(InstigatorActor,-HealthMax);
+}
+
+bool UACTAttributeComponent::IsLowHealth() const
+{
+	return Health <= LowHealth;
 }
 
 bool UACTAttributeComponent::IsAlive() const
@@ -30,6 +37,11 @@ bool UACTAttributeComponent::IsFull() const
 
 bool UACTAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
+	if(!GetOwner()->CanBeDamaged())
+	{
+		return false;
+	}
+	
 	float OldHealth = Health;
 	
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);

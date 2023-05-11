@@ -41,7 +41,7 @@ void UACTInteractionComponent::PrimaryInteract()
 	FRotator EyeRotation;
 	Owner->GetActorEyesViewPoint(EyeLocation,EyeRotation);
 
-	FVector End = EyeLocation + (EyeRotation.Vector() * 200);
+	FVector End = EyeLocation + (EyeRotation.Vector() * 300);
 
 	/*FHitResult Hit;
 	bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQueryParams);*/
