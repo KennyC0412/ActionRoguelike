@@ -6,6 +6,7 @@
 #include "ACTAttributeComponent.h"
 #include "ACTCreditsComponent.h"
 #include "ACTInteractionComponent.h"
+#include "ACTActionComponent.h"
 #include "EngineUtils.h"
 #include "AI/ACTAICharacter.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -27,6 +28,8 @@ AACTCharacter::AACTCharacter()
 
 	AttributeComp = CreateDefaultSubobject<UACTAttributeComponent>("AttributeComp");
 
+	ActionComp = CreateDefaultSubobject<UACTActionComponent>("ActionComp");
+	
 	CreditsComp = CreateDefaultSubobject<UACTCreditsComponent>("CreditsComp");
 	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -57,78 +60,29 @@ void AACTCharacter::MoveRight(float value)
 	AddMovementInput(RightVecator,value);
 }
 
-void AACTCharacter::DashAttack_TimeElapsed()
+void AACTCharacter::SprintStart()
 {
-	SpawnProjectile(DashProjectileClass);
+	ActionComp->StartActionByName(this,"Sprint");
 }
 
-void AACTCharacter::NormalAttack_TimeElapsed()
+void AACTCharacter::SprintStop()
 {
-	SpawnProjectile(NormalProjectileClass);
+	ActionComp->StopActionByName(this,"Sprint");
 }
 
-void AACTCharacter::MagicAttack_TimeElapsed()
+void AACTCharacter::PrimaryAttack()
 {
-	SpawnProjectile(MagicProjectileClass);
+	ActionComp->StartActionByName(this,"PrimaryAttack");
 }
 
-void AACTCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
+void AACTCharacter::BlackHoleAttack()
 {
-	if(ensureAlways(ClassToSpawn))
-	{
-		FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
-
-		
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-		//SpawnParams.Owner = this;
-		
-		FCollisionShape Shape;
-		Shape.SetSphere(20.0f);
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(this);
-
-		FCollisionObjectQueryParams ObjParams;
-		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
-		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
-		
-		FVector TraceStart = CameraComp->GetComponentLocation();
-		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
-
-		FHitResult Hit;
-
-		if(GetWorld()->SweepSingleByObjectType(Hit,TraceStart,TraceEnd,FQuat::Identity,ObjParams,Shape,Params))
-		{
-			TraceEnd = Hit.ImpactPoint;
-		}
-
-		FRotator ProjectileRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
-	
-		FTransform SpawnTM = FTransform(ProjectileRotation,HandLocation);
-		GetWorld()->SpawnActor<AActor>(ClassToSpawn,SpawnTM,SpawnParams);
-	}
-}
-
-void AACTCharacter::NormalAttack()
-{
-	PlayAnimMontage(AttackAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&AACTCharacter::NormalAttack_TimeElapsed,0.2f);
-}
-
-void AACTCharacter::MagicAttack()
-{
-	PlayAnimMontage(AttackAnim);
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&AACTCharacter::MagicAttack_TimeElapsed,0.2f);
+	ActionComp->StartActionByName(this,"BlackHole");
 }
 
 void AACTCharacter::DashAttack()
 {
-	PlayAnimMontage(AttackAnim);
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&AACTCharacter::DashAttack_TimeElapsed,0.2f);
+	ActionComp->StartActionByName(this,"Dash");
 }
 
 void AACTCharacter::PrimaryInteract()
@@ -161,11 +115,15 @@ void AACTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("LookUp",this,&APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("MoveRight",this,&AACTCharacter::MoveRight);
 
-	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed,this,&AACTCharacter::NormalAttack);
-	PlayerInputComponent->BindAction("MagicAttack",IE_Pressed,this,&AACTCharacter::MagicAttack);
+	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed,this,&AACTCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("MagicAttack",IE_Pressed,this,&AACTCharacter::BlackHoleAttack);
 	PlayerInputComponent->BindAction("Dash",IE_Pressed,this,&AACTCharacter::DashAttack);
 
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&AACTCharacter::Jump);
+	
+	PlayerInputComponent->BindAction("Sprint",IE_Pressed,this,&AACTCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint",IE_Released,this,&AACTCharacter::SprintStop);
+	
 	PlayerInputComponent->BindAction("Execute",IE_Pressed,InteractionComp,&UACTInteractionComponent::PrimaryInteract);
 
 }

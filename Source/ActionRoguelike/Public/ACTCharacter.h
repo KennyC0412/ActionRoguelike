@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ACTCharacter.generated.h"
 
+class UACTActionComponent;
 class UACTCreditsComponent;
 class UACTAttributeComponent;
 class UACTInteractionComponent;
@@ -17,28 +18,9 @@ class ACTIONROGUELIKE_API AACTCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-protected:
-
-	UPROPERTY(EditAnywhere,Category="Attack")
-	UAnimMontage* AttackAnim;
-	
-	UPROPERTY(EditAnywhere,Category="Attack")
-	TSubclassOf<AActor> NormalProjectileClass;
-
-	UPROPERTY(EditAnywhere,Category="Attack")
-	TSubclassOf<AActor> MagicProjectileClass;
-
-	UPROPERTY(EditAnywhere,Category="Attack")
-	TSubclassOf<AActor> DashProjectileClass;
-
-	FTimerHandle TimerHandle_PrimaryAttack;
-
 public:
 	// Sets default values for this character's properties
 	AACTCharacter();
-
-	UPROPERTY(VisibleAnywhere)
-	FName HandSocketName = "Muzzle_01";
 
 protected:
 
@@ -56,18 +38,19 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	UACTCreditsComponent* CreditsComp;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
+	UACTActionComponent* ActionComp;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void MoveForward(float value);
 	void MoveRight(float value);
-	void DashAttack_TimeElapsed();
-	void NormalAttack_TimeElapsed();
-	void MagicAttack_TimeElapsed();
-	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
-	void NormalAttack();
-	void MagicAttack();
+	void SprintStart();
+	void SprintStop();
+	void PrimaryAttack();
+	void BlackHoleAttack();
 	void DashAttack();
 	void PrimaryInteract();
 

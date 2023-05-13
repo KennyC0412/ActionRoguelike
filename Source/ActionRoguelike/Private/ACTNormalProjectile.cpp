@@ -39,10 +39,7 @@ void AACTNormalProjectile::BeginPlay()
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this,&AACTNormalProjectile::OnActorOverlap);
 
 	AACTCharacter* Character = Cast<AACTCharacter>(GetInstigator());
-	if(Character && CastSpellVFX)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),CastSpellVFX,Character->GetMesh()->GetSocketLocation(Character->HandSocketName));
-	}
+
 	GetWorldTimerManager().SetTimer(DestroyTimerHandle,this,&AACTNormalProjectile::Destroy,5.0f);
 }
 
