@@ -5,6 +5,8 @@
 
 #include "ACTAttributeComponent.h"
 #include "ACTCharacter.h"
+#include "ACTCoin.h"
+#include "ACTCreditsComponent.h"
 #include "EngineUtils.h"
 #include "AI/ACTAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
@@ -22,6 +24,7 @@ void AACTGameModeBase::StartPlay()
 	Super::StartPlay();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots,this,&AACTGameModeBase::SpawnBotTimerElapsed,SpawnTimerInterval,true);
+	GetWorldTimerManager().SetTimer(TimerHandle_SpawnCoins,this,&AACTGameModeBase::SpawnCoinTimerElapsed,SpawnTimerInterval,true);
 }
 
 void AACTGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
@@ -52,7 +55,6 @@ void AACTGameModeBase::SpawnBotTimerElapsed()
 	for(TActorIterator<AACTAICharacter> It(GetWorld());It; ++It)
 	{
 		AACTAICharacter* Bot = *It;
-
 		
 		UACTAttributeComponent* AttributeComp = UACTAttributeComponent::GetAttributes(Bot);
 		if(AttributeComp && AttributeComp->IsAlive())
@@ -73,6 +75,45 @@ void AACTGameModeBase::SpawnBotTimerElapsed()
 	if(ensure(QueryInstance))
 	{
 		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&AACTGameModeBase::OnQueryCompleted);
+	}
+}
+
+void AACTGameModeBase::OnCoinQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+	EEnvQueryStatus::Type QueryStatus)
+{
+	if(QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp,Display,TEXT("Spawn query failed"));
+		return;
+	}
+	
+	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
+	
+	if(Locations.IsValidIndex(0))
+	{
+		GetWorld()->SpawnActor<AActor>(CoinClass,Locations[0],FRotator::ZeroRotator);
+	}
+}
+
+void AACTGameModeBase::SpawnCoinTimerElapsed()
+{
+	int32 NrOfCoins = 0;
+	for(TActorIterator<AACTCoin> It(GetWorld()); It; ++It)
+	{
+		AACTCoin* Coin = *It;
+		if(Coin)
+		{
+			NrOfCoins++;
+		}
+	}
+
+	float MaxCoinCount = 10;
+	if(NrOfCoins >= MaxCoinCount) return;
+
+	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this,SpawnCoinQuery,this,EEnvQueryRunMode::RandomBest25Pct,nullptr);
+	if(ensure(QueryInstance))
+	{
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&AACTGameModeBase::OnCoinQueryCompleted);
 	}
 }
 
@@ -111,5 +152,18 @@ void AACTGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 		TimerDelegate.BindUFunction(this,"RespawnPlayerElapsed",Player->GetController());
 		
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay,TimerDelegate,2.0f,false);
+	}
+	else
+	{
+		AACTAICharacter* AIPawn = Cast<AACTAICharacter>(VictimActor);
+		if(AIPawn)
+		{
+			AACTCharacter* MyPlayer = Cast<AACTCharacter>(Killer);
+			if(MyPlayer)
+			{
+				UACTCreditsComponent* CreditsComponent = UACTCreditsComponent::GetCredits(MyPlayer);
+				CreditsComponent->ApplyScore(1);
+			}
+		}
 	}
 }

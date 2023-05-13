@@ -47,13 +47,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	bool IsFull() const;
-
+	
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
 	
 	UFUNCTION(BlueprintCallable, Category="Attributes")
 	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
 	
-
-		
 };

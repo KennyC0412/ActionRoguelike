@@ -4,6 +4,7 @@
 #include "ACTCharacter.h"
 
 #include "ACTAttributeComponent.h"
+#include "ACTCreditsComponent.h"
 #include "ACTInteractionComponent.h"
 #include "EngineUtils.h"
 #include "AI/ACTAICharacter.h"
@@ -25,6 +26,8 @@ AACTCharacter::AACTCharacter()
 	InteractionComp = CreateDefaultSubobject<UACTInteractionComponent>("InteractionComp");
 
 	AttributeComp = CreateDefaultSubobject<UACTAttributeComponent>("AttributeComp");
+
+	CreditsComp = CreateDefaultSubobject<UACTCreditsComponent>("CreditsComp");
 	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
@@ -134,6 +137,11 @@ void AACTCharacter::PrimaryInteract()
 	{
 		InteractionComp->PrimaryInteract();
 	}
+}
+
+FVector AACTCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();
 }
 
 // Called every frame

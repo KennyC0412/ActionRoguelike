@@ -5,6 +5,7 @@
 
 #include "ACTAttributeComponent.h"
 #include "ACTCharacter.h"
+#include "ACTGameplayFunctionLibrary.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -69,10 +70,14 @@ void AACTNormalProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedCompone
 {
 	if(!OtherActor) return;
 	if(OtherActor == GetInstigator()) return;
-	UE_LOG(LogNormal,Display,TEXT("Overlap : %s"),*(OtherActor->GetName()));
+	/*UE_LOG(LogNormal,Display,TEXT("Overlap : %s"),*(OtherActor->GetName()));
 
 	UACTAttributeComponent* AttributeComp = Cast<UACTAttributeComponent>(OtherActor->GetComponentByClass(UACTAttributeComponent::StaticClass()));
 	if(!AttributeComp) return;
-	AttributeComp->ApplyHealthChange(OtherActor,-DamageCount);
-	Destroy();
+	AttributeComp->ApplyHealthChange(OtherActor,-DamageCount);*/
+	if(UACTGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(),OtherActor,DamageCount,SweepResult))
+	{
+		Explode();
+	}
+	//Destroy();
 }

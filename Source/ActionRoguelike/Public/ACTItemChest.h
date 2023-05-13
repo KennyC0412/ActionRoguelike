@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ACTGameplayBase.h"
 #include "GameFramework/Actor.h"
 #include "ACTGameplayInterface.h"
 #include "ACTItemChest.generated.h"
 
 UCLASS()
-class ACTIONROGUELIKE_API AACTItemChest : public AActor, public IACTGameplayInterface
+class ACTIONROGUELIKE_API AACTItemChest : public AACTGameplayBase
 {
 	GENERATED_BODY()
 
@@ -17,15 +18,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	float TargetPitch;
 
-	void Interact_Implementation(APawn* InstigatorPawn);
+	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 	
 	// Sets default values for this actor's properties
 	AACTItemChest();
 
 protected:
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* BaseMesh;
-
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	UStaticMeshComponent* LidMesh;
 

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ACTCharacter.generated.h"
 
+class UACTCreditsComponent;
 class UACTAttributeComponent;
 class UACTInteractionComponent;
 class UCameraComponent;
@@ -53,6 +54,8 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	UACTAttributeComponent* AttributeComp;
 
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
+	UACTCreditsComponent* CreditsComp;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -67,7 +70,9 @@ protected:
 	void MagicAttack();
 	void DashAttack();
 	void PrimaryInteract();
-	
+
+	virtual FVector GetPawnViewLocation() const override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

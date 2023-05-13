@@ -19,7 +19,8 @@ class ACTIONROGUELIKE_API AACTGameModeBase : public AGameModeBase
 protected:
 
 	FTimerHandle TimerHandle_SpawnBots;
-
+	FTimerHandle TimerHandle_SpawnCoins;
+	
 	UPROPERTY(EditDefaultsOnly, Category="AI")
 	float SpawnTimerInterval;
 
@@ -27,10 +28,16 @@ protected:
 	UEnvQuery* SpawnBotQuery;
 
 	UPROPERTY(EditDefaultsOnly, Category="AI")
+	UEnvQuery* SpawnCoinQuery;
+
+	UPROPERTY(EditDefaultsOnly, Category="AI")
 	UCurveFloat* DifficultCurve;
 	
 	UPROPERTY(EditDefaultsOnly, Category="AI")
 	TSubclassOf<AActor> MinionClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="AI")
+	TSubclassOf<AActor> CoinClass;
 public:
 
 	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
@@ -40,6 +47,11 @@ public:
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 	
 	void SpawnBotTimerElapsed();
+
+	UFUNCTION()
+	void OnCoinQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+	
+	void SpawnCoinTimerElapsed();
 
 	UFUNCTION(BlueprintCallable)
 	void RespawnPlayerElapsed(APlayerController* Controller);
