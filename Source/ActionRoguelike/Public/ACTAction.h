@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "ACTAction.generated.h"
 
+class UACTActionComponent;
 /**
  * 
  */
@@ -13,8 +15,26 @@ class ACTIONROGUELIKE_API UACTAction : public UObject
 {
 	GENERATED_BODY()
 
-public:
+protected:
+	
+	UFUNCTION(BlueprintCallable, Category="Action")
+	UACTActionComponent* GetOwningComponent() const;
+		
+	UPROPERTY(EditDefaultsOnly, Category = "Tags")
+	FGameplayTagContainer GrantsTags;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Tags")
+	FGameplayTagContainer BlockedTags;
+
+	bool bIsRunning;
+	
+public:
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	bool IsRunning() const;
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Action")
+	bool CanStart(AActor* Instigator);
+	
 	UFUNCTION(BlueprintNativeEvent, Category="Action")
 	void StartAction(AActor* Instigator);
 
