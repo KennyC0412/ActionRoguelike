@@ -53,6 +53,7 @@ protected:
 	void BlackHoleAttack();
 	void DashAttack();
 	void PrimaryInteract();
+	void Parry();
 
 	virtual FVector GetPawnViewLocation() const override;
 

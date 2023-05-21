@@ -3,6 +3,7 @@
 
 #include "ACTNormalProjectile.h"
 
+#include "ACTActionComponent.h"
 #include "ACTAttributeComponent.h"
 #include "ACTCharacter.h"
 #include "ACTGameplayFunctionLibrary.h"
@@ -46,8 +47,7 @@ void AACTNormalProjectile::BeginPlay()
 void AACTNormalProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if(!OtherActor) return;
-	if(OtherActor == GetInstigator()) return;
+	if(!OtherActor || OtherActor == GetInstigator()) return;
 	if(Hit.bBlockingHit)
 	{
 		UE_LOG(LogNormal,Display,TEXT("Hit : %s"),*(OtherActor->GetName()));
@@ -65,13 +65,19 @@ void AACTNormalProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor*
 
 void AACTNormalProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-	if(!OtherActor) return;
-	if(OtherActor == GetInstigator()) return;
-	/*UE_LOG(LogNormal,Display,TEXT("Overlap : %s"),*(OtherActor->GetName()));
+	if(!OtherActor || OtherActor == GetInstigator()) return;
 
-	UACTAttributeComponent* AttributeComp = Cast<UACTAttributeComponent>(OtherActor->GetComponentByClass(UACTAttributeComponent::StaticClass()));
-	if(!AttributeComp) return;
-	AttributeComp->ApplyHealthChange(OtherActor,-DamageCount);*/
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag("Status.Parrying");
+	
+	UACTActionComponent* ActionComponent = Cast<UACTActionComponent>(OtherActor->GetComponentByClass(UACTActionComponent::StaticClass()));
+	if(ActionComponent && ActionComponent->ActiveGameplayTags.HasTag(ParryTag))
+	{
+		ProjectileMovementComp->Velocity = -ProjectileMovementComp->Velocity;
+
+		SetInstigator(Cast<APawn>(OtherActor));
+		return;
+	}
+	
 	if(UACTGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(),OtherActor,DamageCount,SweepResult))
 	{
 		Explode();

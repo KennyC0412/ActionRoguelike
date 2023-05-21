@@ -28,7 +28,6 @@ void UACTAction::StartAction_Implementation(AActor* Instigator)
 
 	UACTActionComponent* Comp = GetOwningComponent();
 	Comp->ActiveGameplayTags.AppendTags(GrantsTags);
-	Comp->ActiveGameplayTags.AppendTags(BlockedTags);
 
 	bIsRunning = true;
 }
@@ -40,7 +39,6 @@ void UACTAction::StopAction_Implementation(AActor* Instigator)
 	ensureAlways(bIsRunning);
 	UACTActionComponent* Comp = GetOwningComponent();
 	Comp->ActiveGameplayTags.RemoveTags(GrantsTags);
-	Comp->ActiveGameplayTags.RemoveTags(BlockedTags);
 
 	bIsRunning = false;
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ACTProjectileBase.h"
+#include "GameplayTagContainer.h"
 #include "ACTNormalProjectile.generated.h"
 
 /**
@@ -17,6 +18,11 @@ class ACTIONROGUELIKE_API AACTNormalProjectile : public AACTProjectileBase
 public:
 	AACTNormalProjectile();
 protected:
+
+	UPROPERTY(EditDefaultsOnly,Category="Damage")
+	FGameplayTag ParryTag;
+
+	
 	
 	virtual void BeginPlay() override;
 	

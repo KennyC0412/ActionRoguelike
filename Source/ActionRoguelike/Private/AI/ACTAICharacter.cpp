@@ -3,6 +3,7 @@
 
 #include "AI/ACTAICharacter.h"
 
+#include "ACTActionComponent.h"
 #include "ACTAttributeComponent.h"
 #include "ACTWorldUserWidget.h"
 #include "AIController.h"
@@ -18,6 +19,7 @@ AACTAICharacter::AACTAICharacter()
 {
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	AttributeComp = CreateDefaultSubobject<UACTAttributeComponent>("AttributeComp");
+	ActionComp = CreateDefaultSubobject<UACTActionComponent>("ActionComp");
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic,ECR_Ignore);

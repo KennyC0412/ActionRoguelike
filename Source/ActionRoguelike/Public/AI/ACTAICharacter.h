@@ -9,6 +9,7 @@
 class UACTWorldUserWidget;
 class UACTAttributeComponent;
 class UPawnSensingComponent;
+class UACTActionComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API AACTAICharacter : public ACharacter
@@ -34,6 +35,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UACTAttributeComponent* AttributeComp;
 
+	UPROPERTY(VisibleAnywhere)
+	UACTActionComponent* ActionComp;
+	
 	UPROPERTY(VisibleAnywhere)
 	FName TimeToHitParamName;
 	

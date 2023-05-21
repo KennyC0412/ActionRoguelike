@@ -93,6 +93,11 @@ void AACTCharacter::PrimaryInteract()
 	}
 }
 
+void AACTCharacter::Parry()
+{
+	ActionComp->StartActionByName(this,"Parry");
+}
+
 FVector AACTCharacter::GetPawnViewLocation() const
 {
 	return CameraComp->GetComponentLocation();
@@ -118,6 +123,7 @@ void AACTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed,this,&AACTCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("MagicAttack",IE_Pressed,this,&AACTCharacter::BlackHoleAttack);
 	PlayerInputComponent->BindAction("Dash",IE_Pressed,this,&AACTCharacter::DashAttack);
+	PlayerInputComponent->BindAction("Parry",IE_Pressed,this,&AACTCharacter::Parry);
 
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&AACTCharacter::Jump);
 	
