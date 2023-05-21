@@ -6,7 +6,7 @@
 #include "ACTAttributeComponent.h"
 #include "ACTCharacter.h"
 #include "ACTCoin.h"
-#include "ACTCreditsComponent.h"
+#include "ACTPlayerState.h"
 #include "EngineUtils.h"
 #include "AI/ACTAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
@@ -17,6 +17,8 @@ static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("act.SpawnBots"),true,TEXT(
 AACTGameModeBase::AACTGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
+	PlayerStateClass = AACTPlayerState::StaticClass();
+	DesiredCount = 25;
 }
 
 void AACTGameModeBase::StartPlay()
@@ -24,7 +26,14 @@ void AACTGameModeBase::StartPlay()
 	Super::StartPlay();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots,this,&AACTGameModeBase::SpawnBotTimerElapsed,SpawnTimerInterval,true);
-	GetWorldTimerManager().SetTimer(TimerHandle_SpawnCoins,this,&AACTGameModeBase::SpawnCoinTimerElapsed,SpawnTimerInterval,true);
+	if(ensure(PowerUpClass.Num() > 0))
+	{
+		UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this,SpawnPowerUpQuery,this,EEnvQueryRunMode::AllMatching,nullptr);
+		if(ensure(QueryInstance))
+		{
+			QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&AACTGameModeBase::OnPowerUpQueryCompleted);
+		}
+	}
 }
 
 void AACTGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
@@ -74,11 +83,11 @@ void AACTGameModeBase::SpawnBotTimerElapsed()
 	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this,SpawnBotQuery,this,EEnvQueryRunMode::RandomBest25Pct,nullptr);
 	if(ensure(QueryInstance))
 	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&AACTGameModeBase::OnQueryCompleted);
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&AACTGameModeBase::OnPowerUpQueryCompleted);
 	}
 }
 
-void AACTGameModeBase::OnCoinQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+void AACTGameModeBase::OnPowerUpQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
 	EEnvQueryStatus::Type QueryStatus)
 {
 	if(QueryStatus != EEnvQueryStatus::Success)
@@ -86,34 +95,43 @@ void AACTGameModeBase::OnCoinQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Q
 		UE_LOG(LogTemp,Display,TEXT("Spawn query failed"));
 		return;
 	}
-	
+
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
 	
-	if(Locations.IsValidIndex(0))
+	TArray<FVector> UsedLocation;
+	
+	int SpawnCount = 0;
+	while(SpawnCount < DesiredCount && Locations.Num() > 0)
 	{
-		GetWorld()->SpawnActor<AActor>(CoinClass,Locations[0],FRotator::ZeroRotator);
-	}
-}
+		int32 RandomLocationIndex = FMath::RandRange(0,Locations.Num()-1);
 
-void AACTGameModeBase::SpawnCoinTimerElapsed()
-{
-	int32 NrOfCoins = 0;
-	for(TActorIterator<AACTCoin> It(GetWorld()); It; ++It)
-	{
-		AACTCoin* Coin = *It;
-		if(Coin)
+		FVector SpawnLocation = Locations[RandomLocationIndex];
+
+		Locations.RemoveAt(RandomLocationIndex);
+		bool bValidLocation = true;
+		for(FVector OtherLocation : UsedLocation)
 		{
-			NrOfCoins++;
+			//check distance
+			float DistanceTo = (SpawnLocation - OtherLocation).Size();
+			if(DistanceTo < RequiredDistance)
+			{
+				bValidLocation = false;
+				break;
+			}
 		}
-	}
 
-	float MaxCoinCount = 10;
-	if(NrOfCoins >= MaxCoinCount) return;
+		//Failed the distance check
+		if(!bValidLocation)
+		{
+			continue;
+		}
 
-	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this,SpawnCoinQuery,this,EEnvQueryRunMode::RandomBest25Pct,nullptr);
-	if(ensure(QueryInstance))
-	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&AACTGameModeBase::OnCoinQueryCompleted);
+		//Pick a random powerup class
+		int32 RandomClassIndex = FMath::RandRange(0,PowerUpClass.Num()-1);
+		GetWorld()->SpawnActor<AActor>(PowerUpClass[RandomClassIndex],SpawnLocation,FRotator::ZeroRotator);
+
+		UsedLocation.Add(SpawnLocation);
+		SpawnCount++;
 	}
 }
 
@@ -161,8 +179,12 @@ void AACTGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 			AACTCharacter* MyPlayer = Cast<AACTCharacter>(Killer);
 			if(MyPlayer)
 			{
-				UACTCreditsComponent* CreditsComponent = UACTCreditsComponent::GetCredits(MyPlayer);
-				CreditsComponent->ApplyScore(1);
+				AACTPlayerState* PS = Cast<AACTPlayerState>(MyPlayer->GetPlayerState());
+				if(PS)
+				{
+					PS->AddCredits(5);
+					PS->AddCoins(5);
+				}
 			}
 		}
 	}

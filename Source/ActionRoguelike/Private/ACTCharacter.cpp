@@ -4,7 +4,6 @@
 #include "ACTCharacter.h"
 
 #include "ACTAttributeComponent.h"
-#include "ACTCreditsComponent.h"
 #include "ACTInteractionComponent.h"
 #include "ACTActionComponent.h"
 #include "EngineUtils.h"
@@ -29,8 +28,6 @@ AACTCharacter::AACTCharacter()
 	AttributeComp = CreateDefaultSubobject<UACTAttributeComponent>("AttributeComp");
 
 	ActionComp = CreateDefaultSubobject<UACTActionComponent>("ActionComp");
-	
-	CreditsComp = CreateDefaultSubobject<UACTCreditsComponent>("CreditsComp");
 	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;

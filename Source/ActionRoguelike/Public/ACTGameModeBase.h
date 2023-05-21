@@ -20,6 +20,12 @@ protected:
 
 	FTimerHandle TimerHandle_SpawnBots;
 	FTimerHandle TimerHandle_SpawnCoins;
+
+	UPROPERTY(EditDefaultsOnly,Category="Credits")
+	int32 DesiredCount = 25;
+
+	UPROPERTY(EditDefaultsOnly,Category="Credits")
+	float RequiredDistance = 1000;
 	
 	UPROPERTY(EditDefaultsOnly, Category="AI")
 	float SpawnTimerInterval;
@@ -28,7 +34,7 @@ protected:
 	UEnvQuery* SpawnBotQuery;
 
 	UPROPERTY(EditDefaultsOnly, Category="AI")
-	UEnvQuery* SpawnCoinQuery;
+	UEnvQuery* SpawnPowerUpQuery;
 
 	UPROPERTY(EditDefaultsOnly, Category="AI")
 	UCurveFloat* DifficultCurve;
@@ -37,7 +43,7 @@ protected:
 	TSubclassOf<AActor> MinionClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="AI")
-	TSubclassOf<AActor> CoinClass;
+	TArray<TSubclassOf<AActor>> PowerUpClass;
 public:
 
 	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
@@ -49,9 +55,7 @@ public:
 	void SpawnBotTimerElapsed();
 
 	UFUNCTION()
-	void OnCoinQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
-	
-	void SpawnCoinTimerElapsed();
+	void OnPowerUpQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UFUNCTION(BlueprintCallable)
 	void RespawnPlayerElapsed(APlayerController* Controller);

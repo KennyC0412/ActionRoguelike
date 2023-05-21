@@ -37,9 +37,6 @@ protected:
 	UACTAttributeComponent* AttributeComp;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
-	UACTCreditsComponent* CreditsComp;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	UACTActionComponent* ActionComp;
 	
 	// Called when the game starts or when spawned

@@ -4,7 +4,7 @@
 #include "ACTHealthPotion.h"
 #include "ACTCharacter.h"
 #include "ACTAttributeComponent.h"
-#include "ACTCreditsComponent.h"
+#include "ACTPlayerState.h"
 // Sets default values
 AACTHealthPotion::AACTHealthPotion()
 {
@@ -44,13 +44,17 @@ void AACTHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 	if(Character)
 	{
 		UACTAttributeComponent* AttrComp = UACTAttributeComponent::GetAttributes(Character);
-		UACTCreditsComponent* CreditsComp = UACTCreditsComponent::GetCredits(Character);
-		if (AttrComp && !AttrComp->IsFull() && CreditsComp->IsEnoughCost(5))
+		if (AttrComp && !AttrComp->IsFull())
 		{
-			AttrComp->ApplyHealthChange(this, 20);
-			ResetVisibility(false);
-			GetWorldTimerManager().SetTimer(VisibilityTimerHandle, this, &AACTHealthPotion::ShowUp_Implementation, RespawnTime);
-			CreditsComp->ApplyCoin(-5);
+			if(AACTPlayerState* PS = InstigatorPawn->GetPlayerState<AACTPlayerState>())
+			{
+				if(PS->RemoveCoins(Cost) && AttrComp->ApplyHealthChange(this,30))
+				{
+					ResetVisibility(false);
+                    GetWorldTimerManager().SetTimer(VisibilityTimerHandle, this, &AACTHealthPotion::ShowUp_Implementation, RespawnTime);
+				}
+			}
+				
 		}
 	}
 }

@@ -4,7 +4,7 @@
 #include "ACTCoin.h"
 
 #include "ACTCharacter.h"
-#include "ACTCreditsComponent.h"
+#include "ACTPlayerState.h"
 
 // Sets default values
 AACTCoin::AACTCoin()
@@ -23,9 +23,12 @@ void AACTCoin::Interact_Implementation(APawn* InstigatorPawn)
 	AACTCharacter* MyPlayer = Cast<AACTCharacter>(InstigatorPawn);
 	if(MyPlayer)
 	{
-		UACTCreditsComponent* CreditsComponent = UACTCreditsComponent::GetCredits(InstigatorPawn);
-		CreditsComponent->ApplyCoin(1);
-		Destroy();
+		AACTPlayerState* PS = Cast<AACTPlayerState>(MyPlayer->GetPlayerState());
+		if(PS)
+		{
+			PS->AddCoins(5);
+			Destroy();
+		}
 	}
 }
 
