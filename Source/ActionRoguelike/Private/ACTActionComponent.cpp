@@ -4,7 +4,7 @@
 #include "ACTActionComponent.h"
 #include "ACTAction.h"
 
-void UACTActionComponent::AddAction(TSubclassOf<UACTAction> ActionClass)
+void UACTActionComponent::AddAction(AActor* Instigator, TSubclassOf<UACTAction> ActionClass)
 {
 	if(!ensure(ActionClass)) return;
 	
@@ -12,6 +12,10 @@ void UACTActionComponent::AddAction(TSubclassOf<UACTAction> ActionClass)
 	if(ensure(Action))
 	{
 		Actions.Add(Action);
+		if(Action->bAutoStart && ensure(Action->CanStart(Instigator)))
+		{
+			Action->StartAction(Instigator);
+		}
 	}
 }
 
@@ -56,6 +60,15 @@ UACTActionComponent::UACTActionComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+void UACTActionComponent::RemoveAction(UACTAction* ActionToMove)
+{
+	if(!ensure(ActionToMove && !ActionToMove->IsRunning()))
+	{
+		return;
+	}
+	Actions.Remove(ActionToMove);
+}
+
 
 void UACTActionComponent::BeginPlay()
 {
@@ -63,7 +76,7 @@ void UACTActionComponent::BeginPlay()
 
 	for(TSubclassOf<UACTAction> ActionClass : DefaultActions)
 	{
-		AddAction(ActionClass);
+		AddAction(GetOwner(), ActionClass);
 	}
 }
 

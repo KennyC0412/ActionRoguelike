@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "ACTNormalProjectile.generated.h"
 
+class UACTActionEffect;
 /**
  * 
  */
@@ -22,7 +23,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly,Category="Damage")
 	FGameplayTag ParryTag;
 
-	
+	UPROPERTY(EditDefaultsOnly,Category="Damage")
+	TSubclassOf<UACTActionEffect> EffectClass;
 	
 	virtual void BeginPlay() override;
 	

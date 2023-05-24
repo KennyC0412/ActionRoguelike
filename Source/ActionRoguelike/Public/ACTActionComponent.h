@@ -8,6 +8,7 @@
 #include "ACTActionComponent.generated.h"
 
 
+class UACTActionEffect;
 class UACTAction;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROGUELIKE_API UACTActionComponent : public UActorComponent
@@ -20,13 +21,16 @@ public:
 	FGameplayTagContainer ActiveGameplayTags;
 	
 	UFUNCTION(BlueprintCallable, Category="Action")
-	void AddAction(TSubclassOf<UACTAction> ActionClass);
+	void AddAction(AActor* Instigator, TSubclassOf<UACTAction> ActionClass);
 
 	UFUNCTION(BlueprintCallable, Category="Action")
 	bool StartActionByName(AActor* Instigator, FName ActionName);
 
 	UFUNCTION(BlueprintCallable, Category="Action")
 	bool StopActionByName(AActor* Instigator, FName ActionName);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveAction(UACTAction* ActionToMove);
 
 	UACTActionComponent();
 
@@ -35,6 +39,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Action")
 	TArray<TSubclassOf<UACTAction>> DefaultActions;
 
+	
 	UPROPERTY()
 	TArray<UACTAction*> Actions;
 	

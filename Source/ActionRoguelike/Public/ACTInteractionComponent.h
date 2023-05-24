@@ -7,6 +7,7 @@
 #include "ACTInteractionComponent.generated.h"
 
 
+class UACTWorldUserWidget;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROGUELIKE_API UACTInteractionComponent : public UActorComponent
 {
@@ -18,15 +19,34 @@ public:
 	UACTInteractionComponent();
 
 protected:
+
+	void FindBestInteractable();
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+	AActor* FocusedActor;
+
+	UPROPERTY(EditDefaultsOnly, Category="Trace")
+	float TraceDistance;
+
+	UPROPERTY(EditDefaultsOnly, Category="Trace")
+	float TraceRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category="Trace")
+	TEnumAsByte<ECollisionChannel> CollisionChannel;
+	
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UACTWorldUserWidget> DefaultWidgetClass;
+
+	UPROPERTY()
+	UACTWorldUserWidget* DefaultWidgetInstance;
+
+	FTimerHandle Timer_FindInteraction;
 public:
 	
 	void PrimaryInteract();
 	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
+	
 };

@@ -4,6 +4,7 @@
 #include "ACTNormalProjectile.h"
 
 #include "ACTActionComponent.h"
+#include "ACTActionEffect.h"
 #include "ACTAttributeComponent.h"
 #include "ACTCharacter.h"
 #include "ACTGameplayFunctionLibrary.h"
@@ -81,6 +82,11 @@ void AACTNormalProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedCompone
 	if(UACTGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(),OtherActor,DamageCount,SweepResult))
 	{
 		Explode();
+
+		if(ActionComponent)
+		{
+			ActionComponent->AddAction(GetInstigator(),EffectClass);
+		}
 	}
 	//Destroy();
 }
