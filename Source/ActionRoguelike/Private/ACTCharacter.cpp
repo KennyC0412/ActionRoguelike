@@ -33,6 +33,15 @@ AACTCharacter::AACTCharacter()
 	bUseControllerRotationYaw = false;
 }
 
+USoundBase* AACTCharacter::GetRandomSound() const
+{
+	if(ManaLackSound.Num() > 0)
+	{
+		return ManaLackSound[FMath::RandRange(0,ManaLackSound.Num()-1)];
+	}
+	return nullptr;
+}
+
 // Called when the game starts or when spawned
 void AACTCharacter::BeginPlay()
 {

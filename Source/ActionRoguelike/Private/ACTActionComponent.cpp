@@ -3,14 +3,20 @@
 
 #include "ACTActionComponent.h"
 #include "ACTAction.h"
+#include "AudioDevice.h"
 
 void UACTActionComponent::AddAction(AActor* Instigator, TSubclassOf<UACTAction> ActionClass)
 {
 	if(!ensure(ActionClass)) return;
-	
 	UACTAction* Action = NewObject<UACTAction>(this,ActionClass);
+	if(HasAction(Action->ActionName))
+	{
+		return;
+	}
 	if(ensure(Action))
 	{
+		FString DebugMsg = FString::Printf(TEXT("Add Action %s"),*Action->ActionName.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, DebugMsg);
 		Actions.Add(Action);
 		if(Action->bAutoStart && ensure(Action->CanStart(Instigator)))
 		{
@@ -87,5 +93,19 @@ void UACTActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 	FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
+}
+
+bool UACTActionComponent::HasAction(FName ActionName)
+{
+	for(UACTAction* Action : Actions)
+	{
+		if(Action->ActionName == ActionName)
+		{
+			FString DebugMsg = FString::Printf(TEXT("Alread had action : %s"),*Action->ActionName.ToString());
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, DebugMsg);
+			return true;
+		}
+	}
+	return false;
 }
 

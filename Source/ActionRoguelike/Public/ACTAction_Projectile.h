@@ -31,6 +31,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
 	UParticleSystem* CastSpellVFX;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Cost")
+	float RageCost;
+	
 	UFUNCTION()
 	void AttackDelay_Elapsed(ACharacter* InstigatorActor);
 

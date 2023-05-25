@@ -57,7 +57,7 @@ void AACTNormalProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor*
 		UACTAttributeComponent* AttributeComp = UACTAttributeComponent::GetAttributes(OtherActor);
 		if(AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(OtherActor,-DamageCount);
+			AttributeComp->ApplyHealthChange(GetInstigator(),-DamageCount);
 		}
 		Explode();
 		GetWorldTimerManager().ClearTimer(DestroyTimerHandle);

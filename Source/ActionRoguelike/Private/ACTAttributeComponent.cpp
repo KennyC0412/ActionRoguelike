@@ -17,6 +17,8 @@ UACTAttributeComponent::UACTAttributeComponent()
 	Health = 100.0f;
 	HealthMax = 100.0f;
 	LowHealth = 30.0f;
+	RageMax = 100.0f;
+	Rage = 0.0f;
 }
 
 bool UACTAttributeComponent::Kill(AActor* InstigatorActor)
@@ -39,6 +41,16 @@ bool UACTAttributeComponent::IsFull() const
 	return Health >= HealthMax;
 }
 
+float UACTAttributeComponent::GetRage() const
+{
+	return Rage;
+}
+
+void UACTAttributeComponent::ReduceRage(float RageToReduce)
+{
+	Rage = FMath::Clamp(Rage - RageToReduce,0.0f,RageMax);
+}
+
 bool UACTAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
 	if(!GetOwner()->CanBeDamaged() && Delta < 0.0f)
@@ -50,6 +62,7 @@ bool UACTAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float De
 	{
 		float DamageMultiplier = CVarDamageMultiplier.GetValueOnGameThread();
 		Delta *= DamageMultiplier;
+		Rage = FMath::Clamp(Rage - Delta,0.0f,RageMax);
 	}
 	
 	float OldHealth = Health;

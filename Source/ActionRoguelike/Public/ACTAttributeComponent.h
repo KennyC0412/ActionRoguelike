@@ -34,6 +34,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
 	float LowHealth;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
+	float RageMax;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
+	float Rage;
 	
 public:
 	UFUNCTION(BlueprintCallable)
@@ -47,6 +53,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	bool IsFull() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetRage() const;
+
+	UFUNCTION(BlueprintCallable)
+	void ReduceRage(float RageToReduce);
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;

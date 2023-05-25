@@ -39,7 +39,19 @@ void AACTAICharacter::SetTargetActor(AActor* NewTarget)
 void AACTAICharacter::OnPawnSeen(APawn* Pawn)
 {
 	SetTargetActor(Pawn);
-	DrawDebugString(GetWorld(),GetActorLocation(),"Player Spotted",nullptr,FColor::White,4.0f,true);
+	if(SpottedWidget == nullptr)
+	{
+		SpottedWidget = CreateWidget<UACTWorldUserWidget>(GetWorld(),SpottedWidgetClass);
+	}
+	if(SpottedWidget && !SpottedWidget->IsInViewport())
+	{
+		SpottedWidget->SetVisibility(ESlateVisibility::Visible);
+		SpottedWidget->AttachedActor = this;
+		SpottedWidget->AddToViewport();
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(SpottedWidget,"SetVisibility",ESlateVisibility::Hidden);
+		GetWorldTimerManager().SetTimer(SpottedHidenHandle,Delegate,1.0f,false);
+	}
 }
 
 void AACTAICharacter::OnHealthChanged(AActor* InstigatorActor, UACTAttributeComponent* OtherComp, float NewHealth, float Delta)
@@ -90,7 +102,3 @@ void AACTAICharacter::PostInitializeComponents()
 	PawnSensingComp->OnSeePawn.AddDynamic(this,&AACTAICharacter::OnPawnSeen);
 	AttributeComp->OnHealthChanged.AddDynamic(this,&AACTAICharacter::OnHealthChanged);
 }
-
-
-
-

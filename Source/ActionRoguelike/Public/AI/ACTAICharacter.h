@@ -28,8 +28,14 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
-	
+
 	UPROPERTY(VisibleAnywhere)
+	UACTWorldUserWidget* SpottedWidget;
+
+	UPROPERTY(EditDefaultsOnly,Category="UI")
+	TSubclassOf<UUserWidget> SpottedWidgetClass;
+	
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	UPawnSensingComponent* PawnSensingComp;
 
 	UPROPERTY(VisibleAnywhere)
@@ -48,6 +54,8 @@ protected:
 	void OnHealthChanged(AActor* OtherActor, UACTAttributeComponent* OtherComp, float NewHealth, float Delta);
 
 	virtual void PostInitializeComponents() override;
+
+	FTimerHandle SpottedHidenHandle;
 public:	
 
 };

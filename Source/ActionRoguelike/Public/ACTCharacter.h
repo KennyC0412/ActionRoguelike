@@ -22,6 +22,7 @@ public:
 	// Sets default values for this character's properties
 	AACTCharacter();
 
+	USoundBase* GetRandomSound() const;
 protected:
 
 	UPROPERTY(VisibleAnywhere,Category="Components")
@@ -38,6 +39,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	UACTActionComponent* ActionComp;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="VFX")
+	TArray<USoundBase*> ManaLackSound;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -68,6 +72,7 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	UACTAttributeComponent* GetAttrributeComp() { return AttributeComp; }
+	UACTActionComponent* GetActionComp() { return ActionComp; }
 
 	UFUNCTION(Exec)
 	void HealSelf(float Amount = 100);

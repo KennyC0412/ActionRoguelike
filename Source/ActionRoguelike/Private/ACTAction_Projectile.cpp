@@ -3,6 +3,8 @@
 
 #include "ACTAction_Projectile.h"
 
+#include "ACTAttributeComponent.h"
+#include "ACTCharacter.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -10,6 +12,7 @@ UACTAction_Projectile::UACTAction_Projectile()
 {
 	HandSocketName = "Muzzle_01";
 	AttackAnimDelay = 0.2f;
+	RageCost = 0.0f;
 }
 
 void UACTAction_Projectile::StartAction_Implementation(AActor* Instigator)
@@ -18,6 +21,22 @@ void UACTAction_Projectile::StartAction_Implementation(AActor* Instigator)
 	ACharacter* Character = Cast<ACharacter>(Instigator);
 	if(Character)
 	{
+		UACTAttributeComponent* AttributeComponent = UACTAttributeComponent::GetAttributes(Instigator);
+		if(AttributeComponent && RageCost > AttributeComponent->GetRage())
+		{
+			AACTCharacter* MyPlayer = Cast<AACTCharacter>(Instigator);
+			if(MyPlayer)
+			{
+				USoundBase* Sound = MyPlayer->GetRandomSound();
+				if(Sound)
+				{
+					UGameplayStatics::PlaySoundAtLocation(GetWorld(),Sound,MyPlayer->GetActorLocation());
+				}
+			}
+			StopAction(Instigator);
+			return;
+		}
+		AttributeComponent->ReduceRage(RageCost);
 		Character->PlayAnimMontage(AttackAnim);
 		UGameplayStatics::SpawnEmitterAttached(CastSpellVFX,Character->GetMesh(),HandSocketName,FVector::ZeroVector,FRotator::ZeroRotator,EAttachLocation::SnapToTarget);
 		
