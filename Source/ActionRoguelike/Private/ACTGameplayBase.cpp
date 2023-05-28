@@ -8,6 +8,8 @@ AACTGameplayBase::AACTGameplayBase()
 {
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>("BaseMesh");
 	RootComponent = BaseMesh;
+
+	SetReplicates(true);
 }
 
 void AACTGameplayBase::Interact_Implementation(APawn* InstigatorPawn)

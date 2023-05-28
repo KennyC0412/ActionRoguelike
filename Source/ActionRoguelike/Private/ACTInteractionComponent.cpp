@@ -15,6 +15,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogInteraction, All, All)
 // Sets default values for this component's properties
 UACTInteractionComponent::UACTInteractionComponent()
 {
+	PrimaryComponentTick.bCanEverTick = true;
 	TraceRadius = 30.0f;
 	TraceDistance = 500.0f;
 	CollisionChannel = ECC_WorldDynamic;
@@ -101,7 +102,7 @@ void UACTInteractionComponent::FindBestInteractable()
 void UACTInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	GetOwner()->GetWorldTimerManager().SetTimer(Timer_FindInteraction,this,&UACTInteractionComponent::FindBestInteractable,0.1f,true);
+	//GetOwner()->GetWorldTimerManager().SetTimer(Timer_FindInteraction,this,&UACTInteractionComponent::FindBestInteractable,0.1f,true);
 	// ...
 	
 }
@@ -109,16 +110,28 @@ void UACTInteractionComponent::BeginPlay()
 
 void UACTInteractionComponent::PrimaryInteract()
 {
-	if(FocusedActor == nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,"No Focus Actor to interact.");
-		return;
-	}
-	APawn* InstigatorPawn = Cast<APawn>(GetOwner());
-	IACTGameplayInterface::Execute_Interact(FocusedActor,InstigatorPawn);
+	ServerInteract(FocusedActor);
+}
+
+
+void UACTInteractionComponent::ServerInteract_Implementation(AActor* InFocus)
+{
+	if(InFocus == nullptr)
+    {
+    	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,"No Focus Actor to interact.");
+    	return;
+    }
+    APawn* InstigatorPawn = Cast<APawn>(GetOwner());
+    IACTGameplayInterface::Execute_Interact(InFocus,InstigatorPawn);
 }
 
 void UACTInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	APawn* MyPawn = Cast<APawn>(GetOwner());
+	if(MyPawn->IsLocallyControlled())
+	{
+		FindBestInteractable();
+	}
 }

@@ -56,7 +56,6 @@ void AACTAICharacter::OnPawnSeen(APawn* Pawn)
 
 void AACTAICharacter::OnHealthChanged(AActor* InstigatorActor, UACTAttributeComponent* OtherComp, float NewHealth, float Delta)
 {
-	
 	if(Delta < 0.0f)
 	{
 		if(InstigatorActor != this)

@@ -168,8 +168,8 @@ void AACTGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindUFunction(this,"RespawnPlayerElapsed",Player->GetController());
-		
-		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay,TimerDelegate,2.0f,false);
+		Player->SetLifeSpan(3.0f);
+		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay,TimerDelegate,5.0f,false);
 	}
 	else
 	{

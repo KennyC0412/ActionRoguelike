@@ -51,7 +51,7 @@ void AACTNormalProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor*
 	if(!OtherActor || OtherActor == GetInstigator()) return;
 	if(Hit.bBlockingHit)
 	{
-		UE_LOG(LogNormal,Display,TEXT("Hit : %s"),*(OtherActor->GetName()));
+		//UE_LOG(LogNormal,Display,TEXT("Hit : %s"),*(OtherActor->GetName()));
 		ProjectileMovementComp->StopMovementImmediately();
 		UGameplayStatics::PlayWorldCameraShake(GetWorld(),CameraShake,Hit.ImpactPoint,0.0f,500.0f);
 		UACTAttributeComponent* AttributeComp = UACTAttributeComponent::GetAttributes(OtherActor);

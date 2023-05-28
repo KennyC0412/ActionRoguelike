@@ -33,15 +33,12 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	UParticleSystemComponent* ParticleSystemComp;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly,ReplicatedUsing="OnRep_LidOpened",BlueprintReadOnly)
 	bool IsClosed = true;
-	
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
+
+	UFUNCTION()
+	void OnRep_LidOpened();
 	
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

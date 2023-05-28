@@ -4,15 +4,13 @@
 #include "ACTItemChest.h"
 
 #include "Particles/ParticleSystemComponent.h"
-
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogChest, All, All)
 
 // Sets default values
 AACTItemChest::AACTItemChest()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 	
 	LidMesh = CreateDefaultSubobject<UStaticMeshComponent>("LidMesh");
 	LidMesh->SetupAttachment(RootComponent);
@@ -23,36 +21,31 @@ AACTItemChest::AACTItemChest()
 	ParticleSystemComp = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystemComp");
 	ParticleSystemComp->SetupAttachment(GoldMesh);
 	TargetPitch = 110.0f;
+
+	SetReplicates(true);
+}
+
+void AACTItemChest::OnRep_LidOpened()
+{
+	float CurPitch = IsClosed ? 0.0f : TargetPitch;
+	
+	LidMesh->SetRelativeRotation(FRotator(CurPitch,0,0));
+	if(CurPitch > 0.0f)
+	{
+		ParticleSystemComp->Activate();
+	}
 }
 
 void AACTItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
-	if(IsClosed)
-	{
-		LidMesh->SetRelativeRotation(FRotator(TargetPitch,0,0));
-		ParticleSystemComp->Activate();
-		IsClosed = false;
-	}
-	else
-	{
-		LidMesh->SetRelativeRotation(FRotator(0,0,0));
-		IsClosed = true;
-	}
+	IsClosed = !IsClosed;
+	OnRep_LidOpened();
 }
 
-
-
-// Called when the game starts or when spawned
-void AACTItemChest::BeginPlay()
+void  AACTItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	Super::BeginPlay();
-	
-}
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-// Called every frame
-void AACTItemChest::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	DOREPLIFETIME(AACTItemChest, IsClosed);
 }
 

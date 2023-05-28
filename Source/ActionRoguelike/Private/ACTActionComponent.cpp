@@ -37,6 +37,12 @@ bool UACTActionComponent::StartActionByName(AActor* Instigator, FName ActionName
             	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, DebugMsg);
 				continue;
 			}
+
+			// Is Client?
+			if(!GetOwner()->HasAuthority())
+			{
+				ServerStartAction(Instigator,ActionName);
+			}
 			
 			Action->StartAction(Instigator);
 			return true;
@@ -61,9 +67,9 @@ bool UACTActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 	return false;
 }
 
-UACTActionComponent::UACTActionComponent()
+void UACTActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	StartActionByName(Instigator,ActionName);
 }
 
 void UACTActionComponent::RemoveAction(UACTAction* ActionToMove)
@@ -74,18 +80,6 @@ void UACTActionComponent::RemoveAction(UACTAction* ActionToMove)
 	}
 	Actions.Remove(ActionToMove);
 }
-
-
-void UACTActionComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	for(TSubclassOf<UACTAction> ActionClass : DefaultActions)
-	{
-		AddAction(GetOwner(), ActionClass);
-	}
-}
-
 
 void UACTActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -101,7 +95,7 @@ bool UACTActionComponent::HasAction(FName ActionName)
 	{
 		if(Action->ActionName == ActionName)
 		{
-			FString DebugMsg = FString::Printf(TEXT("Alread had action : %s"),*Action->ActionName.ToString());
+			FString DebugMsg = FString::Printf(TEXT("Already had action : %s"),*Action->ActionName.ToString());
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, DebugMsg);
 			return true;
 		}
@@ -109,3 +103,18 @@ bool UACTActionComponent::HasAction(FName ActionName)
 	return false;
 }
 
+void UACTActionComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	for(TSubclassOf<UACTAction> ActionClass : DefaultActions)
+	{
+		AddAction(GetOwner(), ActionClass);
+	}
+}
+
+UACTActionComponent::UACTActionComponent()
+{
+	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
+}

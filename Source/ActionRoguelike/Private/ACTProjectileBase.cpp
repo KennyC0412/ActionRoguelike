@@ -31,9 +31,7 @@ AACTProjectileBase::AACTProjectileBase()
 	ProjectileLoopAudioComp = CreateDefaultSubobject<UAudioComponent>("ProjectileLoopAudioComp");
 	ProjectileLoopAudioComp->SetupAttachment(RootComponent);
 
-	/*ProjectileImpactAudioComp = CreateDefaultSubobject<UAudioComponent>("ProjectileImpactAudioComp");
-	ProjectileImpactAudioComp->SetupAttachment(RootComponent);
-	ProjectileImpactAudioComp->bAutoActivate = false;*/
+	SetReplicates(true);
 }
 
 void AACTProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,

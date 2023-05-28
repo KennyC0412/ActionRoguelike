@@ -14,12 +14,15 @@ class ACTIONROGUELIKE_API UACTInteractionComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	
+	void PrimaryInteract();
 	// Sets default values for this component's properties
 	UACTInteractionComponent();
 
 protected:
 
+	UFUNCTION(Server,Reliable)
+	void ServerInteract(AActor* InFocus);
+	
 	void FindBestInteractable();
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -45,7 +48,6 @@ protected:
 	FTimerHandle Timer_FindInteraction;
 public:
 	
-	void PrimaryInteract();
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	

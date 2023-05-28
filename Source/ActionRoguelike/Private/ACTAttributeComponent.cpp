@@ -2,7 +2,7 @@
 
 
 #include "ACTAttributeComponent.h"
-
+#include "Net/UnrealNetwork.h"
 #include "ACTGameModeBase.h"
 
 static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("act.DamageMultiplier"),1.0f,TEXT("Global damage modifier for attribute component"),ECVF_Cheat);
@@ -19,7 +19,10 @@ UACTAttributeComponent::UACTAttributeComponent()
 	LowHealth = 30.0f;
 	RageMax = 100.0f;
 	Rage = 0.0f;
+	
+	SetIsReplicatedByDefault(true);
 }
+
 
 bool UACTAttributeComponent::Kill(AActor* InstigatorActor)
 {
@@ -70,8 +73,11 @@ bool UACTAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float De
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
 	float ActualDelta = Health - OldHealth;
-	OnHealthChanged.Broadcast(InstigatorActor,this,Health,ActualDelta);
-
+	if(ActualDelta != 0.0f)
+	{
+		MulticastHealthChanged(InstigatorActor,Health,ActualDelta);
+	}
+	
 	if(ActualDelta < 0.0f && Health == 0.0f)
 	{
 		AACTGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AACTGameModeBase>();
@@ -97,4 +103,20 @@ bool UACTAttributeComponent::IsActorAlive(AActor* Actor)
 		return AttributeComp->IsAlive();
 	
 	return false;
+}
+
+void UACTAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UACTAttributeComponent,Health);
+	DOREPLIFETIME(UACTAttributeComponent,HealthMax);
+
+	//DOREPLIFETIME(UACTAttributeComponent,HealthMax,COND_OwnerOnly);
+
+}
+
+void UACTAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
+{
+	OnHealthChanged.Broadcast(InstigatorActor,this,Health,Delta);
 }
