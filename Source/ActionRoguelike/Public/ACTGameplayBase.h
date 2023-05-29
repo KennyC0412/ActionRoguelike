@@ -16,16 +16,18 @@ public:
 	AACTGameplayBase();
 protected:
 	
+	UPROPERTY(EditDefaultsOnly,ReplicatedUsing="OnRep_Interact",BlueprintReadOnly)
+	bool bIsVisible = true;
+
+	UFUNCTION()
+	void OnRep_Interact();
+	
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent*  BaseMesh;
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
-
-	virtual void ShowUp_Implementation() override;
-
-	virtual void Hide_Implementation() override;
 	
-	virtual void ResetVisibility(bool bIsActive);
+	virtual void ResetVisibility(UStaticMeshComponent* StaticMesh, bool bIsActive);
 public:
 	
 };

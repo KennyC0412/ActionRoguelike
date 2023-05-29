@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "ACTAttributeComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, UACTAttributeComponent*, OwningComp, float, NewHealth, float, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAttributeChanged, AActor*, InstigatorActor, UACTAttributeComponent*, OwningComp, float, NewHealth, float, Delta);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROGUELIKE_API UACTAttributeComponent : public UActorComponent
@@ -35,10 +35,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
 	float LowHealth;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Replicated,Category="Attributes")
 	float RageMax;
 	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category="Attributes")
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Replicated,Category="Attributes")
 	float Rage;
 
 	UFUNCTION(NetMulticast,Reliable) // @FIXME: mark as unreliable once we moved  the 'state' our of scharacter
@@ -64,9 +64,15 @@ public:
 	void ReduceRage(float RageToReduce);
 	
 	UPROPERTY(BlueprintAssignable)
-	FOnHealthChanged OnHealthChanged;
+	FOnAttributeChanged OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChanged OnRageChanged;
 	
 	UFUNCTION(BlueprintCallable, Category="Attributes")
 	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
-	
+
+	UFUNCTION(BlueprintCallable, Category="Attributes")
+    bool ApplyRage(AActor* InstigatorActor, float Delta);
+
 };

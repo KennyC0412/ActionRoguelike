@@ -22,6 +22,7 @@ public:
 protected:
 
 	void SetTargetActor(AActor* NewTarget);
+	AActor* GetTargetActor() const;
 
 	UPROPERTY(VisibleAnywhere)
 	UACTWorldUserWidget* ActiveHealthBar;
@@ -56,6 +57,9 @@ protected:
 	virtual void PostInitializeComponents() override;
 
 	FTimerHandle SpottedHidenHandle;
+
+	UPROPERTY(VisibleAnywhere)
+	FName TargeActorKey;
 public:	
 
 };

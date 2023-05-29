@@ -14,9 +14,14 @@ void AACTGrantActions::Interact_Implementation(APawn* InstigatorPawn)
 	{
 		UACTActionComponent* ActionComponent = MyPlayer->GetActionComp();
 		if(ActionComponent)
-		for(TSubclassOf<UACTAction> ActionClass : CanGainActions)
 		{
-			ActionComponent->AddAction(MyPlayer,ActionClass);
+			for(TSubclassOf<UACTAction> ActionClass : CanGainActions)
+            {
+				if(!ActionComponent->HasAction(ActionClass))
+				{
+					ActionComponent->AddAction(MyPlayer,ActionClass);
+				}
+            }
 		}
 	}
 }

@@ -5,6 +5,7 @@
 
 #include "ACTActionComponent.h"
 #include "ACTAttributeComponent.h"
+#include "ACTGameplayFunctionLibrary.h"
 
 UACTActionEffect_Thorns::UACTActionEffect_Thorns()
 {
@@ -12,15 +13,15 @@ UACTActionEffect_Thorns::UACTActionEffect_Thorns()
 	Period = 0.0f;
 }
 
-void UACTActionEffect_Thorns::ReflectDamage(AActor* OtherActor, UACTAttributeComponent* OwningComp, float NewHealth, float Delta)
+void UACTActionEffect_Thorns::ReflectDamage(AActor* InstigatorActor, UACTAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
-	if(OtherActor == GetOwningComponent()->GetOwner() || Delta > 0)
+	AActor* OwningActor = GetOwningComponent()->GetOwner();
+	if(InstigatorActor == GetOwningComponent()->GetOwner() || Delta >= 0.0f)
 	{
 		return;
 	}
-	int32 ActualDamage = Delta * ThornsPercent * 1000;
-	UACTAttributeComponent* OtherComp = UACTAttributeComponent::GetAttributes(OtherActor);
-	OtherComp->ApplyHealthChange(GetOwningComponent()->GetOwner(), ActualDamage);
+	int32 ActualDamage = -FMath::RoundToInt(Delta * ThornsPercent);
+	UACTGameplayFunctionLibrary::ApplyDamage(OwningActor,InstigatorActor,ActualDamage);
 }
 
 void UACTActionEffect_Thorns::StartAction_Implementation(AActor* Instigator)
@@ -28,14 +29,20 @@ void UACTActionEffect_Thorns::StartAction_Implementation(AActor* Instigator)
 	UE_LOG(LogTemp,Display,TEXT("Thorns start"));
 	Super::StartAction_Implementation(Instigator);
 
-	FTimerDelegate Delegate;
 	UACTAttributeComponent* AttributeComponent = UACTAttributeComponent::GetAttributes(Instigator);
-	AttributeComponent->OnHealthChanged.AddDynamic(this,&UACTActionEffect_Thorns::ReflectDamage);
-	//Instigator->GetWorldTimerManager().SetTimer();
+	if(AttributeComponent)
+	{
+		AttributeComponent->OnHealthChanged.AddDynamic(this,&UACTActionEffect_Thorns::ReflectDamage);
+	}
 }
 
 void UACTActionEffect_Thorns::StopAction_Implementation(AActor* Instigator)
 {
+	Super::StopAction_Implementation(Instigator);
+
 	UACTAttributeComponent* AttributeComponent = UACTAttributeComponent::GetAttributes(Instigator);
-	AttributeComponent->OnHealthChanged.RemoveDynamic(this,&UACTActionEffect_Thorns::ReflectDamage);
+	if(AttributeComponent)
+	{
+		AttributeComponent->OnHealthChanged.RemoveDynamic(this,&UACTActionEffect_Thorns::ReflectDamage);
+	}
 }

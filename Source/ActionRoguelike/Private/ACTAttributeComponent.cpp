@@ -65,19 +65,19 @@ bool UACTAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float De
 	{
 		float DamageMultiplier = CVarDamageMultiplier.GetValueOnGameThread();
 		Delta *= DamageMultiplier;
-		Rage = FMath::Clamp(Rage - Delta,0.0f,RageMax);
+		//if(InstigatorActor != GetOwner())
+		{
+			ApplyRage(InstigatorActor,-Delta);
+		}
 	}
 	
 	float OldHealth = Health;
-	
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
-
 	float ActualDelta = Health - OldHealth;
 	if(ActualDelta != 0.0f)
 	{
 		MulticastHealthChanged(InstigatorActor,Health,ActualDelta);
 	}
-	
 	if(ActualDelta < 0.0f && Health == 0.0f)
 	{
 		AACTGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AACTGameModeBase>();
@@ -86,6 +86,12 @@ bool UACTAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float De
 			GameMode->OnActorKilled(GetOwner(),InstigatorActor);
 		}
 	}
+	return true;
+}
+
+bool UACTAttributeComponent::ApplyRage(AActor* InstigatorActor, float Delta)
+{
+	Rage = FMath::Clamp(Rage + Delta,0.0f,RageMax);
 	return true;
 }
 
@@ -111,7 +117,8 @@ void UACTAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 
 	DOREPLIFETIME(UACTAttributeComponent,Health);
 	DOREPLIFETIME(UACTAttributeComponent,HealthMax);
-
+	DOREPLIFETIME(UACTAttributeComponent,Rage);
+	DOREPLIFETIME(UACTAttributeComponent,RageMax);
 	//DOREPLIFETIME(UACTAttributeComponent,HealthMax,COND_OwnerOnly);
 
 }

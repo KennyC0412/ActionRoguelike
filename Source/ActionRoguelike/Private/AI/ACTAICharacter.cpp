@@ -25,32 +25,46 @@ AACTAICharacter::AACTAICharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic,ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 	TimeToHitParamName = "TimeToHit";
+	TargeActorKey = "TargetActor";
 }
 
 void AACTAICharacter::SetTargetActor(AActor* NewTarget)
 {
 	AAIController* AIController = Cast<AAIController>(GetController());
-	if(ensure(AIController))
+	if(AIController)
 	{
-		AIController->GetBlackboardComponent()->SetValueAsObject("TargetActor",NewTarget);
+		AIController->GetBlackboardComponent()->SetValueAsObject(TargeActorKey,NewTarget);
 	}
+}
+
+AActor* AACTAICharacter::GetTargetActor() const
+{
+	AAIController* AIController = Cast<AAIController>(GetController());
+    if(AIController)
+    {
+    	return Cast<AActor>(AIController->GetBlackboardComponent()->GetValueAsObject(TargeActorKey));
+    }
+	return nullptr;
 }
 
 void AACTAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	SetTargetActor(Pawn);
-	if(SpottedWidget == nullptr)
+	if(GetTargetActor() != Pawn)
 	{
-		SpottedWidget = CreateWidget<UACTWorldUserWidget>(GetWorld(),SpottedWidgetClass);
-	}
-	if(SpottedWidget && !SpottedWidget->IsInViewport())
-	{
-		SpottedWidget->SetVisibility(ESlateVisibility::Visible);
-		SpottedWidget->AttachedActor = this;
-		SpottedWidget->AddToViewport();
-		FTimerDelegate Delegate;
-		Delegate.BindUFunction(SpottedWidget,"SetVisibility",ESlateVisibility::Hidden);
-		GetWorldTimerManager().SetTimer(SpottedHidenHandle,Delegate,1.0f,false);
+		SetTargetActor(Pawn);
+		if(SpottedWidget == nullptr)
+        {
+        	SpottedWidget = CreateWidget<UACTWorldUserWidget>(GetWorld(),SpottedWidgetClass);
+        }
+        if(SpottedWidget && !SpottedWidget->IsInViewport())
+        {
+        	SpottedWidget->SetVisibility(ESlateVisibility::Visible);
+        	SpottedWidget->AttachedActor = this;
+        	SpottedWidget->AddToViewport();
+        	FTimerDelegate Delegate;
+        	Delegate.BindUFunction(SpottedWidget,"SetVisibility",ESlateVisibility::Hidden);
+        	GetWorldTimerManager().SetTimer(SpottedHidenHandle,Delegate,1.0f,false);
+        }
 	}
 }
 

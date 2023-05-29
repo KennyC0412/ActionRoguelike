@@ -9,10 +9,7 @@ void UACTActionComponent::AddAction(AActor* Instigator, TSubclassOf<UACTAction> 
 {
 	if(!ensure(ActionClass)) return;
 	UACTAction* Action = NewObject<UACTAction>(this,ActionClass);
-	if(HasAction(Action->ActionName))
-	{
-		return;
-	}
+
 	if(ensure(Action))
 	{
 		FString DebugMsg = FString::Printf(TEXT("Add Action %s"),*Action->ActionName.ToString());
@@ -89,11 +86,11 @@ void UACTActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
 }
 
-bool UACTActionComponent::HasAction(FName ActionName)
+bool UACTActionComponent::HasAction(TSubclassOf<UACTAction> ActionClass)
 {
 	for(UACTAction* Action : Actions)
 	{
-		if(Action->ActionName == ActionName)
+		if(Action && Action->IsA(ActionClass))
 		{
 			FString DebugMsg = FString::Printf(TEXT("Already had action : %s"),*Action->ActionName.ToString());
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, DebugMsg);
@@ -109,6 +106,10 @@ void UACTActionComponent::BeginPlay()
 
 	for(TSubclassOf<UACTAction> ActionClass : DefaultActions)
 	{
+		if(HasAction(ActionClass))
+		{
+			continue;
+		}
 		AddAction(GetOwner(), ActionClass);
 	}
 }

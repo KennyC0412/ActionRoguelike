@@ -22,8 +22,12 @@ protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	UFUNCTION(Server,Reliable)
+	void ServerInteract(APawn* InstigatorPawn);
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
