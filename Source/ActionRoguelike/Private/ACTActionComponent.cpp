@@ -4,16 +4,19 @@
 #include "ACTActionComponent.h"
 #include "ACTAction.h"
 #include "AudioDevice.h"
+#include "Net/UnrealNetwork.h"
+#include "ActionRoguelike/ActionRoguelike.h"
+#include "Engine/ActorChannel.h"
 
 void UACTActionComponent::AddAction(AActor* Instigator, TSubclassOf<UACTAction> ActionClass)
 {
 	if(!ensure(ActionClass)) return;
-	UACTAction* Action = NewObject<UACTAction>(this,ActionClass);
-
+	UACTAction* Action = NewObject<UACTAction>(GetOwner(),ActionClass);
 	if(ensure(Action))
 	{
 		FString DebugMsg = FString::Printf(TEXT("Add Action %s"),*Action->ActionName.ToString());
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, DebugMsg);
+		Action->Initialize(this);
 		Actions.Add(Action);
 		if(Action->bAutoStart && ensure(Action->CanStart(Instigator)))
 		{
@@ -82,8 +85,19 @@ void UACTActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
+	//FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
+	for(UACTAction* Action : Actions)
+	{
+		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
+		FString ActionMsg = FString::Printf(TEXT("[%s] Action:%s : IsRunning: %s : Outer: %s"),
+			*GetNameSafe(GetOwner()),
+			*Action->ActionName.ToString(),
+			Action->IsRunning() ? TEXT("true") : TEXT("false"),
+			*GetNameSafe(Action->GetOuter())
+			);
+		LogOnScreen(this,ActionMsg,TextColor,0.0f);
+	}
 }
 
 bool UACTActionComponent::HasAction(TSubclassOf<UACTAction> ActionClass)
@@ -104,18 +118,41 @@ void UACTActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for(TSubclassOf<UACTAction> ActionClass : DefaultActions)
+	if(GetOwner()->HasAuthority())
 	{
-		if(HasAction(ActionClass))
+		for(TSubclassOf<UACTAction> ActionClass : DefaultActions)
 		{
-			continue;
+			if(HasAction(ActionClass))
+			{
+				continue;
+			}
+			AddAction(GetOwner(), ActionClass);
 		}
-		AddAction(GetOwner(), ActionClass);
 	}
+}
+
+bool UACTActionComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+{
+	bool WroteSomething =  Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+	for(UACTAction* Action : Actions)
+	{
+		if(Action)
+		{
+			WroteSomething |= Channel->ReplicateSubobject(Action,*Bunch,*RepFlags);
+		}
+	}
+	
+	return WroteSomething;
 }
 
 UACTActionComponent::UACTActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicatedByDefault(true);
+}
+
+void UACTActionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UACTActionComponent,Actions);
 }

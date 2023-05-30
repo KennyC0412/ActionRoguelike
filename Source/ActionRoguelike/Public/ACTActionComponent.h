@@ -43,11 +43,13 @@ protected:
 	TArray<TSubclassOf<UACTAction>> DefaultActions;
 
 	
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	TArray<UACTAction*> Actions;
 	
 	virtual void BeginPlay() override;
 
+	virtual bool ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, FReplicationFlags *RepFlags) override;
+	
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	bool HasAction(TSubclassOf<UACTAction> ActionClass);

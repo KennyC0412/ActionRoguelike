@@ -4,6 +4,8 @@
 #include "ACTAction.h"
 
 #include "ACTActionComponent.h"
+#include "ActionRoguelike/ActionRoguelike.h"
+#include "Net/UnrealNetwork.h"
 
 
 bool UACTAction::CanStart_Implementation(AActor* Instigator)
@@ -24,7 +26,7 @@ bool UACTAction::CanStart_Implementation(AActor* Instigator)
 
 void UACTAction::StartAction_Implementation(AActor* Instigator)
 {
-	UE_LOG(LogTemp, Log, TEXT("Running: %s"),*GetNameSafe(this));
+	LogOnScreen(this,FString::Printf(TEXT("Started: %s"),*ActionName.ToString()));
 
 	UACTActionComponent* Comp = GetOwningComponent();
 	Comp->ActiveGameplayTags.AppendTags(GrantsTags);
@@ -34,9 +36,10 @@ void UACTAction::StartAction_Implementation(AActor* Instigator)
 
 void UACTAction::StopAction_Implementation(AActor* Instigator)
 {
-	UE_LOG(LogTemp, Log, TEXT("Stop: %s"),*GetNameSafe(this));
-
-	ensureAlways(bIsRunning);
+	LogOnScreen(this,FString::Printf(TEXT("Stopped: %s"),*ActionName.ToString()));
+	
+	//ensureAlways(bIsRunning);
+	
 	UACTActionComponent* Comp = GetOwningComponent();
 	Comp->ActiveGameplayTags.RemoveTags(GrantsTags);
 
@@ -45,7 +48,7 @@ void UACTAction::StopAction_Implementation(AActor* Instigator)
 
 UWorld* UACTAction::GetWorld() const
 {
-	UActorComponent* ActorComponent = Cast<UActorComponent>(GetOuter());
+	AActor* ActorComponent = Cast<AActor>(GetOuter());
 	if(ActorComponent)
 	{
 		return ActorComponent->GetWorld();
@@ -56,7 +59,24 @@ UWorld* UACTAction::GetWorld() const
 
 UACTActionComponent* UACTAction::GetOwningComponent() const
 {
-	return Cast<UACTActionComponent>(GetOuter());
+	return ActionComp;
+}
+
+void UACTAction::OnRep_IsRunning()
+{
+	if(bIsRunning)
+	{
+		StartAction(nullptr);
+	}
+	else
+	{
+		StopAction(nullptr);
+	}
+}
+
+void UACTAction::Initialize(UACTActionComponent* NewActionComp)
+{
+	ActionComp = NewActionComp;
 }
 
 bool UACTAction::IsRunning() const
@@ -64,3 +84,9 @@ bool UACTAction::IsRunning() const
 	return bIsRunning;
 }
 
+void UACTAction::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UACTAction,bIsRunning);
+	DOREPLIFETIME(UACTAction,ActionComp);
+}

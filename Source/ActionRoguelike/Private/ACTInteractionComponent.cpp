@@ -62,7 +62,6 @@ void UACTInteractionComponent::FindBestInteractable()
 			if(HitActor->Implements<UACTGameplayInterface>())
 			{
 				FocusedActor = HitActor;
-				UE_LOG(LogTemp, Log, TEXT("Focus"));
 				break;
 			}
 		}
