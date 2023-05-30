@@ -43,7 +43,9 @@ protected:
 
 	UFUNCTION(NetMulticast,Reliable) // @FIXME: mark as unreliable once we moved  the 'state' our of scharacter
 	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
-	
+
+	UFUNCTION(NetMulticast,Unreliable)
+    void MulticastRageChanged(AActor* InstigatorActor, float NewRage, float Delta);
 public:
 	UFUNCTION(BlueprintCallable)
 	bool Kill(AActor* InstigatorActor);

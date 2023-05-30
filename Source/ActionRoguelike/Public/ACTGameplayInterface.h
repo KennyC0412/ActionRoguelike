@@ -24,10 +24,4 @@ class ACTIONROGUELIKE_API IACTGameplayInterface
 public:
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
 	void Interact(APawn* InstigatorPawn);
-
-	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
-	void ShowUp();
-
-	UFUNCTION(BlueprintNativeEvent,BlueprintCallable)
-	void Hide();
 };

@@ -182,8 +182,8 @@ void AACTGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 				AACTPlayerState* PS = Cast<AACTPlayerState>(MyPlayer->GetPlayerState());
 				if(PS)
 				{
-					PS->AddCredits(5);
-					PS->AddCoins(5);
+					PS->AddCredits(CreditsPerKill);
+					PS->ApplyCoins(CreditsPerKill);
 				}
 			}
 		}

@@ -22,6 +22,9 @@ protected:
 	FTimerHandle TimerHandle_SpawnCoins;
 
 	UPROPERTY(EditDefaultsOnly,Category="Credits")
+	int32 CreditsPerKill = 5;
+	
+	UPROPERTY(EditDefaultsOnly,Category="Credits")
 	int32 DesiredCount = 25;
 
 	UPROPERTY(EditDefaultsOnly,Category="Credits")

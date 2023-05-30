@@ -19,6 +19,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly,ReplicatedUsing="OnRep_Interact",BlueprintReadOnly)
 	bool bIsVisible = true;
 
+	UPROPERTY(EditDefaultsOnly)
+    float RespawnTime;
+
 	UFUNCTION()
 	void OnRep_Interact();
 	
@@ -26,7 +29,12 @@ protected:
 	UStaticMeshComponent*  BaseMesh;
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
-	
+	void ShowUp();
+
+	void HideAndCooldownPowerup();
+
+	FTimerHandle RespawnTimerHandle;
+
 	virtual void ResetVisibility(UStaticMeshComponent* StaticMesh, bool bIsActive);
 public:
 	

@@ -18,18 +18,26 @@ void AACTCoin::BeginPlay()
 	
 }
 
-void AACTCoin::Interact_Implementation(APawn* InstigatorPawn)
+void AACTCoin::ServerInteract_Implementation(APawn* InstigatorPawn)
 {
+	if (!BaseMesh->IsVisible()) return;
+
 	AACTCharacter* MyPlayer = Cast<AACTCharacter>(InstigatorPawn);
 	if(MyPlayer)
 	{
 		AACTPlayerState* PS = Cast<AACTPlayerState>(MyPlayer->GetPlayerState());
 		if(PS)
 		{
-			PS->AddCoins(5);
-			Destroy();
+			PS->ApplyCoins(5);
+			HideAndCooldownPowerup();
+			//Destroy();
 		}
 	}
+}
+
+void AACTCoin::Interact_Implementation(APawn* InstigatorPawn)
+{
+	ServerInteract(InstigatorPawn);
 }
 
 // Called every frame

@@ -23,7 +23,6 @@ UACTAttributeComponent::UACTAttributeComponent()
 	SetIsReplicatedByDefault(true);
 }
 
-
 bool UACTAttributeComponent::Kill(AActor* InstigatorActor)
 {
 	return ApplyHealthChange(InstigatorActor,-HealthMax);
@@ -65,15 +64,13 @@ bool UACTAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float De
 	{
 		float DamageMultiplier = CVarDamageMultiplier.GetValueOnGameThread();
 		Delta *= DamageMultiplier;
-		//if(InstigatorActor != GetOwner())
-		{
-			ApplyRage(InstigatorActor,-Delta);
-		}
+		ApplyRage(InstigatorActor,-Delta);
 	}
 	
 	float OldHealth = Health;
 	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 	float ActualDelta = Health - OldHealth;
+
 	if(ActualDelta != 0.0f)
 	{
 		MulticastHealthChanged(InstigatorActor,Health,ActualDelta);
@@ -86,12 +83,17 @@ bool UACTAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float De
 			GameMode->OnActorKilled(GetOwner(),InstigatorActor);
 		}
 	}
-	return true;
+	
+	return ActualDelta != 0;
 }
 
 bool UACTAttributeComponent::ApplyRage(AActor* InstigatorActor, float Delta)
 {
 	Rage = FMath::Clamp(Rage + Delta,0.0f,RageMax);
+	if(Delta != 0.0f)
+	{
+		MulticastRageChanged_Implementation(InstigatorActor,Rage,Delta);
+	}
 	return true;
 }
 
@@ -126,4 +128,9 @@ void UACTAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 void UACTAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
 {
 	OnHealthChanged.Broadcast(InstigatorActor,this,Health,Delta);
+}
+
+void UACTAttributeComponent::MulticastRageChanged_Implementation(AActor* InstigatorActor, float NewRage, float Delta)
+{
+	OnRageChanged.Broadcast(InstigatorActor,this,Rage,Delta);
 }

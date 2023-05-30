@@ -14,8 +14,9 @@ AACTHealthPotion::AACTHealthPotion()
 	RespawnTime = 10.0f;
 }
 
+
 void AACTHealthPotion::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
+                                      UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
 	return;
 }
@@ -37,6 +38,11 @@ void AACTHealthPotion::Tick(float DeltaTime)
 
 void AACTHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
+	ServerInteract(InstigatorPawn);
+}
+
+void AACTHealthPotion::ServerInteract_Implementation(APawn* InstigatorPawn)
+{
 	if (!BaseMesh->IsVisible()) return;
 
 	AACTCharacter* Character = Cast<AACTCharacter>(InstigatorPawn);
@@ -48,10 +54,9 @@ void AACTHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		{
 			if(AACTPlayerState* PS = InstigatorPawn->GetPlayerState<AACTPlayerState>())
 			{
-				if(PS->RemoveCoins(Cost) && AttrComp->ApplyHealthChange(this,30))
+				if(PS->ApplyCoins(-Cost) && AttrComp->ApplyHealthChange(this,30))
 				{
-					ResetVisibility(false);
-                    GetWorldTimerManager().SetTimer(VisibilityTimerHandle, this, &AACTHealthPotion::ShowUp_Implementation, RespawnTime);
+					HideAndCooldownPowerup();
 				}
 			}
 				

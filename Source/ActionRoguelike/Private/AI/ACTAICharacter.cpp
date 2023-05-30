@@ -52,19 +52,24 @@ void AACTAICharacter::OnPawnSeen(APawn* Pawn)
 	if(GetTargetActor() != Pawn)
 	{
 		SetTargetActor(Pawn);
-		if(SpottedWidget == nullptr)
-        {
-        	SpottedWidget = CreateWidget<UACTWorldUserWidget>(GetWorld(),SpottedWidgetClass);
-        }
-        if(SpottedWidget && !SpottedWidget->IsInViewport())
-        {
-        	SpottedWidget->SetVisibility(ESlateVisibility::Visible);
-        	SpottedWidget->AttachedActor = this;
-        	SpottedWidget->AddToViewport();
-        	FTimerDelegate Delegate;
-        	Delegate.BindUFunction(SpottedWidget,"SetVisibility",ESlateVisibility::Hidden);
-        	GetWorldTimerManager().SetTimer(SpottedHidenHandle,Delegate,1.0f,false);
-        }
+		MulticastOnPawnSeen();
+	}
+}
+
+void AACTAICharacter::MulticastOnPawnSeen_Implementation()
+{
+	if(SpottedWidget == nullptr)
+	{
+		SpottedWidget = CreateWidget<UACTWorldUserWidget>(GetWorld(),SpottedWidgetClass);
+	}
+	if(SpottedWidget && !SpottedWidget->IsInViewport())
+	{
+		SpottedWidget->SetVisibility(ESlateVisibility::Visible);
+		SpottedWidget->AttachedActor = this;
+		SpottedWidget->AddToViewport();
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(SpottedWidget,"SetVisibility",ESlateVisibility::Hidden);
+		GetWorldTimerManager().SetTimer(SpottedHidenHandle,Delegate,1.0f,false);
 	}
 }
 

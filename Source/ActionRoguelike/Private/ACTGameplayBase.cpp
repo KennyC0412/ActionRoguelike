@@ -3,6 +3,8 @@
 
 #include "ACTGameplayBase.h"
 
+#include "Net/UnrealNetwork.h"
+
 
 AACTGameplayBase::AACTGameplayBase()
 {
@@ -12,23 +14,39 @@ AACTGameplayBase::AACTGameplayBase()
 	SetReplicates(true);
 }
 
+void AACTGameplayBase::OnRep_Interact()
+{
+	ResetVisibility(BaseMesh,bIsVisible);
+}
+
 void AACTGameplayBase::Interact_Implementation(APawn* InstigatorPawn)
 {
-	
+	OnRep_Interact();
 }
 
-void AACTGameplayBase::ShowUp_Implementation()
+void AACTGameplayBase::ShowUp()
 {
-	ResetVisibility(true);
+	ResetVisibility(BaseMesh,true);
 }
 
-void AACTGameplayBase::Hide_Implementation()
+void AACTGameplayBase::HideAndCooldownPowerup()
 {
-	ResetVisibility(false);
+	ResetVisibility(BaseMesh,false);
+	GetWorldTimerManager().SetTimer(RespawnTimerHandle,this,&AACTGameplayBase::ShowUp,RespawnTime);
 }
 
-void AACTGameplayBase::ResetVisibility(bool bIsActive)
+void AACTGameplayBase::ResetVisibility(UStaticMeshComponent* StaticMesh, bool isVisible)
 {
-	SetActorEnableCollision(bIsActive);
-	RootComponent->SetVisibility(bIsActive,true);
+	bIsVisible = isVisible;
+	if(StaticMesh)
+	{
+		SetActorEnableCollision(bIsVisible);
+		StaticMesh->SetVisibility(bIsVisible,true);
+	}
+}
+
+void AACTGameplayBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AACTGameplayBase,bIsVisible);
 }

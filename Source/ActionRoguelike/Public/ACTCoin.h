@@ -28,6 +28,8 @@ protected:
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
+	FTimerHandle VisibilityTimerHandle;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

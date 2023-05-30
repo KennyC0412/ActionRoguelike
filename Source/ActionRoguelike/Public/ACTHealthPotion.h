@@ -16,6 +16,7 @@ class ACTIONROGUELIKE_API AACTHealthPotion : public AACTGameplayBase
 	GENERATED_BODY()
 	
 public:
+	
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
 	// Sets default values for this actor's properties
@@ -23,17 +24,15 @@ public:
 
 protected:
 
+	UFUNCTION(Server,Reliable)
+	void ServerInteract(APawn* InstigatorPawn);
+	
 	UFUNCTION()
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	FTimerHandle VisibilityTimerHandle;
-
-	UPROPERTY(EditDefaultsOnly)
-	float RespawnTime;
-
+	
 	float Yaw = 0.0f;
 
 	int32 Cost;
