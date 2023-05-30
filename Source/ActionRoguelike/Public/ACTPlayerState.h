@@ -18,10 +18,10 @@ class ACTIONROGUELIKE_API AACTPlayerState : public APlayerState
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditDefaultsOnly,Replicated,Category="Credits");
+	UPROPERTY(EditDefaultsOnly,ReplicatedUsing="OnRep_Credits",Category="Credits");
 	int32 Credits;
 
-	UPROPERTY(EditDefaultsOnly,Replicated,Category="Credits");
+	UPROPERTY(EditDefaultsOnly,ReplicatedUsing="OnRep_Coins",Category="Credits");
 	int32 Coins;
 
 	UFUNCTION(NetMulticast,Reliable)
@@ -29,6 +29,12 @@ protected:
 
 	UFUNCTION(NetMulticast,Reliable)
 	void MultiCastCreditChanged(int32 OldState);
+
+	UFUNCTION()
+	void OnRep_Credits(int32 OldCredits);
+
+	UFUNCTION()
+	void OnRep_Coins(int32 OldCoins);
 
 public:
 	AACTPlayerState();

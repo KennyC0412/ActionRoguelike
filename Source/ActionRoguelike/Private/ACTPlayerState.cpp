@@ -12,6 +12,16 @@ void AACTPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 }
 
 
+void AACTPlayerState::OnRep_Credits(int32 OldCredits)
+{
+	OnCreditsChanged.Broadcast(this,Credits,Credits - OldCredits);
+}
+
+void AACTPlayerState::OnRep_Coins(int32 OldCoins)
+{
+	OnCoinsChanged.Broadcast(this,Coins,Coins - OldCoins);
+}
+
 AACTPlayerState::AACTPlayerState()
 {
 	Coins = 0;
@@ -29,8 +39,8 @@ void AACTPlayerState::AddCredits(int32 Delta)
 	
 	Credits += Delta;
 	
-	MultiCastCreditChanged_Implementation(OldCredits);
-	//OnCreditsChanged.Broadcast(this,Credits,Delta);
+	//MultiCastCreditChanged_Implementation(OldCredits);
+	OnCreditsChanged.Broadcast(this,Credits,Delta);
 }
 
 bool AACTPlayerState::ApplyCoins(int32 Delta)
@@ -42,10 +52,10 @@ bool AACTPlayerState::ApplyCoins(int32 Delta)
 		return false;
 	}
 	int OldCoins = Coins;
+	
 	Coins += Delta;
-	MultiCastCoinChanged_Implementation(OldCoins);
-
-	//OnCoinsChanged.Broadcast(this,Coins,Delta);
+	//MultiCastCoinChanged_Implementation(OldCoins);
+	OnCoinsChanged.Broadcast(this,Coins,Delta);
 	return true;
 }
 

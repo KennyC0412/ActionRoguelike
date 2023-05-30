@@ -68,19 +68,25 @@ bool UACTAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float De
 	}
 	
 	float OldHealth = Health;
-	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
-	float ActualDelta = Health - OldHealth;
-
-	if(ActualDelta != 0.0f)
+	float NewHealth = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
+	float ActualDelta = NewHealth - OldHealth;
+	
+	if(GetOwner()->HasAuthority())
 	{
-		MulticastHealthChanged(InstigatorActor,Health,ActualDelta);
-	}
-	if(ActualDelta < 0.0f && Health == 0.0f)
-	{
-		AACTGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AACTGameModeBase>();
-		if(GameMode)
+		Health = NewHealth;
+		
+		if(ActualDelta != 0.0f)
 		{
-			GameMode->OnActorKilled(GetOwner(),InstigatorActor);
+			MulticastHealthChanged(InstigatorActor,Health,ActualDelta);
+		}
+		
+		if(ActualDelta < 0.0f && Health == 0.0f)
+		{
+			AACTGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AACTGameModeBase>();
+			if(GameMode)
+			{
+				GameMode->OnActorKilled(GetOwner(),InstigatorActor);
+			}
 		}
 	}
 	

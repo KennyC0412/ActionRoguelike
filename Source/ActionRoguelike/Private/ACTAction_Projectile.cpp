@@ -22,6 +22,7 @@ void UACTAction_Projectile::StartAction_Implementation(AActor* Instigator)
 	if(Character)
 	{
 		UACTAttributeComponent* AttributeComponent = UACTAttributeComponent::GetAttributes(Instigator);
+
 		if(AttributeComponent && RageCost > AttributeComponent->GetRage())
 		{
 			AACTCharacter* MyPlayer = Cast<AACTCharacter>(Instigator);
@@ -40,12 +41,15 @@ void UACTAction_Projectile::StartAction_Implementation(AActor* Instigator)
 		Character->PlayAnimMontage(AttackAnim);
 		UGameplayStatics::SpawnEmitterAttached(CastSpellVFX,Character->GetMesh(),HandSocketName,FVector::ZeroVector,FRotator::ZeroRotator,EAttachLocation::SnapToTarget);
 		
-		FTimerHandle TimerHandle_AttackDelay;
+		if(Character->HasAuthority())
+		{
+			FTimerHandle TimerHandle_AttackDelay;
 
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindUFunction(this,"AttackDelay_Elapsed",Character);
+			FTimerDelegate TimerDelegate;
+			TimerDelegate.BindUFunction(this,"AttackDelay_Elapsed",Character);
 		
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_AttackDelay,TimerDelegate,AttackAnimDelay,false);
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle_AttackDelay,TimerDelegate,AttackAnimDelay,false);
+		}
 	}
 
 }
