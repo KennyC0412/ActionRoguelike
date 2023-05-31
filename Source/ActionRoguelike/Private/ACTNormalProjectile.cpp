@@ -83,7 +83,7 @@ void AACTNormalProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedCompone
 	{
 		Explode();
 
-		if(ActionComponent && EffectClass)
+		if(ActionComponent && EffectClass && HasAuthority())
 		{
 			ActionComponent->AddAction(GetInstigator(),EffectClass);
 		}

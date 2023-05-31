@@ -11,6 +11,13 @@
 void UACTActionComponent::AddAction(AActor* Instigator, TSubclassOf<UACTAction> ActionClass)
 {
 	if(!ensure(ActionClass)) return;
+
+	if(!GetOwner()->HasAuthority())
+	{
+		UE_LOG(LogTemp,Warning,TEXT("Client attemping to add action. [Class: %s]"),*GetNameSafe(ActionClass));
+		return;
+	}
+	
 	UACTAction* Action = NewObject<UACTAction>(GetOwner(),ActionClass);
 	if(ensure(Action))
 	{
@@ -59,6 +66,12 @@ bool UACTActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 		{
 			if(Action->IsRunning())
 			{
+				// Is Client?
+				if(!GetOwner()->HasAuthority())
+				{
+					ServerStopAction(Instigator,ActionName);
+				}
+				
 				Action->StopAction(Instigator);
 				return true;
 			}
@@ -144,6 +157,11 @@ UACTActionComponent::UACTActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicatedByDefault(true);
+}
+
+void UACTActionComponent::ServerStopAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	StopActionByName(Instigator,ActionName);
 }
 
 void UACTActionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
