@@ -9,3 +9,16 @@ void AACTPlayerController::SetPawn(APawn* InPawn)
 
 	OnPawnChanged.Broadcast(InPawn);
 }
+
+void AACTPlayerController::BeginPlayingState()
+{
+	//Super::BeginPlayingState();
+	BlueprintBeginPlayingState();
+}
+
+void AACTPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	
+	OnPlayerStateReceived.Broadcast(PlayerState);
+}

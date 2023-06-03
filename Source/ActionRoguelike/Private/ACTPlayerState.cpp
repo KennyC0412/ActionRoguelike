@@ -63,8 +63,10 @@ void AACTPlayerState::LoadPlayerState_Implementation(UACTSaveGame* SaveObject)
 {
 	if(SaveObject)
 	{
-		Credits = SaveObject->Credits;
-		Coins = SaveObject->Coins;
+		//Credits = SaveObject->Credits;
+		//Coins = SaveObject->Coins;
+		AddCredits(SaveObject->Credits);
+		ApplyCoins(SaveObject->Coins);
 	}
 }
 
