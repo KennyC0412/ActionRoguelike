@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ACTGameModeBase.h"
+#include "ACTSaveGame.h"
 #include "GameFramework/PlayerState.h"
 #include "ACTPlayerState.generated.h"
 
@@ -24,12 +26,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly,ReplicatedUsing="OnRep_Coins",Category="Credits");
 	int32 Coins;
 
-	UFUNCTION(NetMulticast,Reliable)
-	void MultiCastCoinChanged(int32 OldState);
-
-	UFUNCTION(NetMulticast,Reliable)
-	void MultiCastCreditChanged(int32 OldState);
-
 	UFUNCTION()
 	void OnRep_Credits(int32 OldCredits);
 
@@ -50,6 +46,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category= "Credits")
 	bool ApplyCoins(int32 Delta);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SavePlayerState(UACTSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintNativeEvent)
+    void LoadPlayerState(UACTSaveGame* SaveObject);
 
 	UPROPERTY(BlueprintAssignable, Category= "Credits")
 	FOnCreditsChanged OnCreditsChanged;

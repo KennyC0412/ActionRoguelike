@@ -7,6 +7,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "ACTGameModeBase.generated.h"
 
+class UACTSaveGame;
 /**
  * 
  */
@@ -18,6 +19,11 @@ class ACTIONROGUELIKE_API AACTGameModeBase : public AGameModeBase
 	AACTGameModeBase();
 protected:
 
+	FString SlotName;
+
+	UPROPERTY()
+	UACTSaveGame* CurrentSaveGame;
+	
 	FTimerHandle TimerHandle_SpawnBots;
 	FTimerHandle TimerHandle_SpawnCoins;
 
@@ -51,6 +57,8 @@ public:
 
 	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
 	virtual void StartPlay() override;
+
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	
 	UFUNCTION()
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
@@ -62,7 +70,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void RespawnPlayerElapsed(APlayerController* Controller);
-	
+
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
 	UFUNCTION(Exec)
 	void KillAllAI();
+
+	UFUNCTION(BlueprintCallable, Category="SaveGame")
+	void WriteSaveGame();
+
+	void LoadSaveGame();
+
 };

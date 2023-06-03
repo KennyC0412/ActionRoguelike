@@ -26,6 +26,7 @@ AACTAICharacter::AACTAICharacter()
 	GetMesh()->SetGenerateOverlapEvents(true);
 	TimeToHitParamName = "TimeToHit";
 	TargeActorKey = "TargetActor";
+
 }
 
 void AACTAICharacter::SetTargetActor(AActor* NewTarget)

@@ -19,7 +19,8 @@ public:
 	float TargetPitch;
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
-	
+
+	virtual void OnActorLoaded_Implementation() override;
 	// Sets default values for this actor's properties
 	AACTItemChest();
 
@@ -33,7 +34,7 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	UParticleSystemComponent* ParticleSystemComp;
 	
-	UPROPERTY(EditDefaultsOnly,ReplicatedUsing="OnRep_LidOpened",BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly,ReplicatedUsing="OnRep_LidOpened",BlueprintReadOnly,SaveGame)
 	bool IsClosed = true;
 
 	UFUNCTION()

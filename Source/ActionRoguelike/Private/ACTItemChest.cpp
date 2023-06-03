@@ -42,6 +42,12 @@ void AACTItemChest::Interact_Implementation(APawn* InstigatorPawn)
 	OnRep_LidOpened();
 }
 
+void AACTItemChest::OnActorLoaded_Implementation()
+{
+	Super::OnActorLoaded_Implementation();
+	OnRep_LidOpened();
+}
+
 void  AACTItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

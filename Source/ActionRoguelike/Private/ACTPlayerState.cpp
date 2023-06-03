@@ -59,14 +59,22 @@ bool AACTPlayerState::ApplyCoins(int32 Delta)
 	return true;
 }
 
-void AACTPlayerState::MultiCastCreditChanged_Implementation(int32 OldState)
+void AACTPlayerState::LoadPlayerState_Implementation(UACTSaveGame* SaveObject)
 {
-	OnCreditsChanged.Broadcast(this,Credits,Credits - OldState);
+	if(SaveObject)
+	{
+		Credits = SaveObject->Credits;
+		Coins = SaveObject->Coins;
+	}
 }
 
-void AACTPlayerState::MultiCastCoinChanged_Implementation(int32 OldState)
+void AACTPlayerState::SavePlayerState_Implementation(UACTSaveGame* SaveObject)
 {
-	OnCoinsChanged.Broadcast(this,Coins,Coins - OldState);
+	if(SaveObject)
+	{
+		SaveObject->Credits = Credits;
+		SaveObject->Coins = Coins;
+	}
 }
 
 int32 AACTPlayerState::GetCredits() const
