@@ -159,13 +159,13 @@ void AACTGameModeBase::RespawnPlayerElapsed(APlayerController* Controller)
 
 void AACTGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
-
 	AACTPlayerState* PS = NewPlayer->GetPlayerState<AACTPlayerState>();
 	if(PS)
 	{
 		PS->LoadPlayerState(CurrentSaveGame);
 	}
+
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }
 
 
