@@ -4,6 +4,7 @@
 #include "ACTActionEffect.h"
 
 #include "ACTActionComponent.h"
+#include "GameFramework/GameStateBase.h"
 
 void UACTActionEffect::ExecutePeriodicEffect_Implementation(AActor* Instigator)
 {
@@ -49,6 +50,17 @@ void UACTActionEffect::StopAction_Implementation(AActor* Instigator)
 	{
 		Comp->RemoveAction(this);
 	}
+}
+
+float UACTActionEffect::GetTimeRemaining() const
+{
+	AGameStateBase* GS = GetWorld()->GetGameState<AGameStateBase>();
+	if(GS)
+	{
+		float EndTime = TimeStarted + Duration;
+		return EndTime - GS->GetServerWorldTimeSeconds();
+	}
+	return Duration;
 }
 
 UACTActionEffect::UACTActionEffect()

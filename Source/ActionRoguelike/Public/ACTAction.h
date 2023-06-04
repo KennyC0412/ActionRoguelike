@@ -32,6 +32,9 @@ class ACTIONROGUELIKE_API UACTAction : public UObject
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="UI")
+	UTexture2D* Icon;
+	
 	UPROPERTY(Replicated)
 	UACTActionComponent* ActionComp;
 	
@@ -47,6 +50,9 @@ protected:
 	UPROPERTY(ReplicatedUsing="OnRep_RepData")
 	FActionRepData RepData;
 
+	UPROPERTY(Replicated)
+	float TimeStarted;
+	
 	UFUNCTION()
 	void OnRep_RepData();
 	
@@ -59,7 +65,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	bool IsRunning() const;
-
+	
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	bool CanStart(AActor* Instigator);
 	

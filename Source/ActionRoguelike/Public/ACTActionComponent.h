@@ -7,6 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "ACTActionComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActionStateChanged, UACTActionComponent*, OwningComp, UACTAction*, Action);
 
 class UACTActionEffect;
 class UACTAction;
@@ -46,14 +47,21 @@ protected:
 	TArray<TSubclassOf<UACTAction>> DefaultActions;
 
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	TArray<UACTAction*> Actions;
 	
 	virtual void BeginPlay() override;
 
 	virtual bool ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, FReplicationFlags *RepFlags) override;
 	
-public:	
+public:
+
+	UPROPERTY(BlueprintAssignable)
+	FOnActionStateChanged OnActionStarted;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnActionStateChanged OnActionStopped;
+	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	bool HasAction(TSubclassOf<UACTAction> ActionClass);
 		
