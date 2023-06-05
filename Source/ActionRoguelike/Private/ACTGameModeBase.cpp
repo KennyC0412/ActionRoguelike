@@ -3,12 +3,15 @@
 
 #include "ACTGameModeBase.h"
 
+#include "ACTActionComponent.h"
 #include "ACTAttributeComponent.h"
 #include "ACTCharacter.h"
 #include "ACTCoin.h"
+#include "ACTMonsterData.h"
 #include "ACTPlayerState.h"
 #include "ACTSaveGame.h"
 #include "EngineUtils.h"
+#include "ActionRoguelike/ActionRoguelike.h"
 #include "AI/ACTAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "GameFramework/GameStateBase.h"
@@ -60,7 +63,29 @@ void AACTGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Query
 	
 	if(Locations.IsValidIndex(0))
 	{
-		GetWorld()->SpawnActor<AActor>(MinionClass,Locations[0],FRotator::ZeroRotator);
+		if(MonsterTable)
+		{
+			TArray<FMonsterInfoRow*> Rows;
+			MonsterTable->GetAllRows("",Rows);
+
+			int32 RandomIndex = FMath::RandRange(0,Rows.Num()-1);
+			FMonsterInfoRow* SelectedRow = Rows[RandomIndex];
+
+			AActor* NewBot = GetWorld()->SpawnActor<AActor>(SelectedRow->MonsterData->MonsterClass,Locations[0],FRotator::ZeroRotator);
+			if(NewBot)
+			{
+				LogOnScreen(this, FString::Printf(TEXT("Spawn enemy: %s (%s)"),*GetNameSafe(NewBot),*GetNameSafe(SelectedRow->MonsterData)));
+
+				UACTActionComponent* ActionComp = Cast<UACTActionComponent>(NewBot->GetComponentByClass(UACTActionComponent::StaticClass()));
+				if(ActionComp)
+				{
+					for(TSubclassOf<UACTAction> ActionClass : SelectedRow->MonsterData->Actions)
+					{
+						ActionComp->AddAction(NewBot, ActionClass);
+					}
+				}
+			}
+		}
 	}
 }
 

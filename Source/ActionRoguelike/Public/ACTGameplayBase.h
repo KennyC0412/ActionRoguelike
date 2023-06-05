@@ -14,6 +14,7 @@ class ACTIONROGUELIKE_API AACTGameplayBase : public AActor, public IACTGameplayI
 	
 public:	
 	AACTGameplayBase();
+	
 protected:
 	
 	UPROPERTY(EditDefaultsOnly,ReplicatedUsing="OnRep_Interact",BlueprintReadOnly)
@@ -28,14 +29,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent*  BaseMesh;
 
-	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 	void ShowUp();
 
 	void HideAndCooldownPowerup();
 
 	FTimerHandle RespawnTimerHandle;
-
+	
 	virtual void ResetVisibility(UStaticMeshComponent* StaticMesh, bool bIsActive);
 public:
-	
+
+	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
+
+	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
 };

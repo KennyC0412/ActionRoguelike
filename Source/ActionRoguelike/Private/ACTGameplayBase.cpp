@@ -35,6 +35,11 @@ void AACTGameplayBase::HideAndCooldownPowerup()
 	GetWorldTimerManager().SetTimer(RespawnTimerHandle,this,&AACTGameplayBase::ShowUp,RespawnTime);
 }
 
+FText AACTGameplayBase::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	return FText::GetEmpty();
+}
+
 void AACTGameplayBase::ResetVisibility(UStaticMeshComponent* StaticMesh, bool isVisible)
 {
 	bIsVisible = isVisible;

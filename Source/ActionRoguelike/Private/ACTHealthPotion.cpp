@@ -5,6 +5,9 @@
 #include "ACTCharacter.h"
 #include "ACTAttributeComponent.h"
 #include "ACTPlayerState.h"
+
+#define LOCTEXT_NAMESPACE
+
 // Sets default values
 AACTHealthPotion::AACTHealthPotion()
 {
@@ -59,7 +62,19 @@ void AACTHealthPotion::ServerInteract_Implementation(APawn* InstigatorPawn)
 					HideAndCooldownPowerup();
 				}
 			}
-				
 		}
 	}
 }
+
+
+FText AACTHealthPotion::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	UACTAttributeComponent* AttrComp = UACTAttributeComponent::GetAttributes(InstigatorPawn);
+	if (AttrComp && AttrComp->IsFull())
+	{
+		return NSLOCTEXT("InteractableActors", "HealthPotion_FullHealth", "Already at full health.");
+	}
+	return FText::Format(NSLOCTEXT("InteractableActors", "HealthPotion_InteractMessage", "Cost {0} coins. Restore 30 health."),Cost);
+}
+
+#undef LOCTEXT_NAMESPACE

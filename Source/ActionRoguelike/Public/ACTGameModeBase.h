@@ -3,11 +3,43 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "GameFramework/GameModeBase.h"
 #include "ACTGameModeBase.generated.h"
 
+class UDataTable;
 class UACTSaveGame;
+class UACTMonsterData;
+
+USTRUCT(BlueprintType)
+struct FMonsterInfoRow : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+public:
+
+	FMonsterInfoRow()
+	{
+		Weight = 1.0f;
+		SpawnCost = 5.0f;
+		KillReward = 5.0f;
+	}
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UACTMonsterData* MonsterData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Weight;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnCost;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float KillReward;
+
+};
+
 /**
  * 
  */
@@ -23,6 +55,9 @@ protected:
 
 	UPROPERTY()
 	UACTSaveGame* CurrentSaveGame;
+
+	UPROPERTY(EditDefaultsOnly, Category="AI")
+	UDataTable* MonsterTable;
 	
 	FTimerHandle TimerHandle_SpawnBots;
 	FTimerHandle TimerHandle_SpawnCoins;
@@ -48,8 +83,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="AI")
 	UCurveFloat* DifficultCurve;
 	
-	UPROPERTY(EditDefaultsOnly, Category="AI")
-	TSubclassOf<AActor> MinionClass;
+	/*UPROPERTY(EditDefaultsOnly, Category="AI")
+	TSubclassOf<AActor> MinionClass;*/
 
 	UPROPERTY(EditDefaultsOnly, Category="AI")
 	TArray<TSubclassOf<AActor>> PowerUpClass;
