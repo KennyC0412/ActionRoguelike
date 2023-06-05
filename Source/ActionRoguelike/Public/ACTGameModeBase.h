@@ -27,7 +27,7 @@ public:
 	}
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UACTMonsterData* MonsterData;
+	FPrimaryAssetId MonsterId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Weight;
@@ -94,6 +94,8 @@ public:
 	virtual void StartPlay() override;
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
+	void OnMonsterLoaded(FPrimaryAssetId PrimaryAssetId, FVector SpawnLocation);
 	
 	UFUNCTION()
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
