@@ -4,6 +4,7 @@
 #include "ACTPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
+
 void AACTPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -31,10 +32,6 @@ AACTPlayerState::AACTPlayerState()
 
 void AACTPlayerState::AddCredits(int32 Delta)
 {
-	if(!ensure(Delta > 0.0f))
-	{
-		return;
-	}
 	int OldCredits = Credits;
 	
 	Credits += Delta;

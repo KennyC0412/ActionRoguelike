@@ -15,5 +15,11 @@
 				"CoreUObject"
 			]
 		}
+	],
+	"Plugins": [
+		{
+			"Name": "BlueprintFileUtils",
+			"Enabled": true
+		}
 	]
 }
